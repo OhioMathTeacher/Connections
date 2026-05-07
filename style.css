@@ -234,6 +234,18 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   font-size: 0.8rem;
 }
 
+.pr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.pr-row .meta { color: var(--muted); font-size: 0.85rem; margin-top: 0.15rem; }
+.pr-row a { color: var(--fg); text-decoration: none; }
+.pr-row a:hover { text-decoration: underline; }
+.review-header { margin-bottom: 1rem; }
+
 @media (max-width: 480px) {
   main { padding: 1rem; }
   .tile { height: 64px; font-size: 0.8rem; }

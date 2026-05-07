@@ -1,8 +1,9 @@
 // Connections Builder - vanilla JS, no build step
 // Repo for "submit to repo" flow:
-const REPO_OWNER = "ohiomathteacher";
-const REPO_NAME = "connections";
+const REPO_OWNER = "OhioMathTeacher";
+const REPO_NAME = "Connections";
 const REPO_BRANCH = "main";
+const GITHUB_API = "https://api.github.com";
 const DIFFICULTIES = ["yellow", "green", "blue", "purple"];
 
 const app = document.getElementById("app");
@@ -53,6 +54,11 @@ function route() {
   }
   if (hash === "#/build") return renderBuild();
   if (hash === "#/about") return renderAbout();
+  if (hash === "#/review") return renderReview();
+  if (hash.startsWith("#/review/")) {
+    const num = hash.slice("#/review/".length);
+    return renderReviewPR(num);
+  }
   return renderHome();
 }
 
@@ -64,9 +70,7 @@ async function renderHome() {
   renderTemplate("view-home");
   const list = $("#puzzle-list");
   try {
-    const res = await fetch("puzzles/index.json", { cache: "no-cache" });
-    if (!res.ok) throw new Error("index.json missing");
-    const items = await res.json();
+    const items = await discoverPuzzles();
     if (!items.length) {
       list.innerHTML = `<li class="loading">No puzzles yet — be the first to <a href="#/build">build one</a>.</li>`;
       return;
@@ -78,8 +82,54 @@ async function renderHome() {
       list.appendChild(li);
     }
   } catch (e) {
-    list.innerHTML = `<li class="loading">No puzzles found yet. <a href="#/build">Build one →</a></li>`;
+    list.innerHTML = `<li class="loading">Couldn't load puzzles. <a href="#/build">Build one →</a></li>`;
   }
+}
+
+// Auto-discover puzzles in puzzles/ folder via GitHub Contents API.
+// Falls back to puzzles/index.json (or known filenames) if GitHub is unreachable.
+async function discoverPuzzles() {
+  let files = [];
+  try {
+    const res = await fetch(`${GITHUB_API}/repos/${REPO_OWNER}/${REPO_NAME}/contents/puzzles?ref=${REPO_BRANCH}`, {
+      headers: { "Accept": "application/vnd.github+json" },
+    });
+    if (res.ok) {
+      const entries = await res.json();
+      files = entries
+        .filter(e => e.type === "file" && e.name.endsWith(".json") && e.name !== "index.json")
+        .map(e => e.name);
+    }
+  } catch (e) { /* fallback below */ }
+
+  if (!files.length) {
+    // Local-dev fallback: try index.json for an explicit list
+    try {
+      const r = await fetch("puzzles/index.json", { cache: "no-cache" });
+      if (r.ok) {
+        const items = await r.json();
+        return items.map(it => ({
+          slug: it.slug,
+          title: it.title || it.slug,
+          author: it.author || "",
+        }));
+      }
+    } catch (e) { /* ignore */ }
+    return [];
+  }
+
+  const items = await Promise.all(files.map(async (name) => {
+    const slug = name.replace(/\.json$/, "");
+    try {
+      const r = await fetch(`puzzles/${name}`, { cache: "no-cache" });
+      if (!r.ok) return null;
+      const p = await r.json();
+      return { slug, title: p.title || slug, author: p.author || "" };
+    } catch (e) {
+      return { slug, title: slug, author: "" };
+    }
+  }));
+  return items.filter(Boolean).sort((a, b) => a.title.localeCompare(b.title));
 }
 
 function escapeHtml(s) {
@@ -116,6 +166,11 @@ function renderPlay(puzzle) {
     return;
   }
   renderTemplate("view-play");
+  initPlay(puzzle);
+}
+
+function initPlay(puzzle) {
+  if (!validatePuzzle(puzzle)) return;
   $("#play-title").textContent = puzzle.title || "Untitled";
   $("#play-author").textContent = puzzle.author ? `by ${puzzle.author}` : "";
 
@@ -268,14 +323,11 @@ function renderBuild() {
     const filename = `puzzles/${slug}.json`;
     const content = JSON.stringify(p, null, 2) + "\n";
     const url = `https://github.com/${REPO_OWNER}/${REPO_NAME}/new/${REPO_BRANCH}?filename=${encodeURIComponent(filename)}&value=${encodeURIComponent(content)}`;
-    const indexUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/edit/${REPO_BRANCH}/puzzles/index.json`;
     const out = $("#build-output");
     out.innerHTML = `
       <h3>Submit to repo</h3>
-      <ol>
-        <li><a href="${url}" target="_blank" rel="noopener">Open the pre-filled new-file page</a> on GitHub. Click "Propose new file" at the bottom — that opens a pull request (or commits directly if you're a maintainer).</li>
-        <li>Then <a href="${indexUrl}" target="_blank" rel="noopener">edit puzzles/index.json</a> and add an entry: <code>{"slug":"${escapeHtml(slug)}","title":"${escapeHtml(p.title)}","author":"${escapeHtml(p.author || "")}"}</code></li>
-      </ol>
+      <p><a href="${url}" target="_blank" rel="noopener">Open the pre-filled new-file page on GitHub →</a></p>
+      <p class="muted">Click "Propose new file" / "Commit changes". A maintainer will review your puzzle on the Review page and merge it. Once merged, it appears on the Play list automatically — no other steps needed.</p>
       <details><summary>Or copy the JSON manually</summary><pre>${escapeHtml(content)}</pre></details>
     `;
   };
@@ -309,6 +361,117 @@ function readForm() {
 
 function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50) || "puzzle";
+}
+
+// ---------- Review ----------
+
+async function renderReview() {
+  renderTemplate("view-review");
+  const list = $("#review-list");
+  list.innerHTML = `<li class="loading">Loading open pull requests…</li>`;
+  try {
+    const prs = await fetchPuzzlePRs();
+    if (!prs.length) {
+      list.innerHTML = `<li class="loading">No pending puzzle submissions. 🎉</li>`;
+      return;
+    }
+    list.innerHTML = "";
+    for (const pr of prs) {
+      const li = document.createElement("li");
+      const fileNames = pr.puzzleFiles.map(f => f.filename).join(", ");
+      li.innerHTML = `
+        <div class="pr-row">
+          <div class="pr-info">
+            <a href="#/review/${pr.number}"><strong>#${pr.number}: ${escapeHtml(pr.title)}</strong></a>
+            <div class="meta">by ${escapeHtml(pr.user.login)} · ${escapeHtml(fileNames)}</div>
+          </div>
+          <div class="pr-actions">
+            <a href="${pr.html_url}" target="_blank" rel="noopener">View on GitHub →</a>
+          </div>
+        </div>`;
+      list.appendChild(li);
+    }
+  } catch (e) {
+    list.innerHTML = `<li class="loading">Couldn't load PRs. ${escapeHtml(e.message || "")}</li>`;
+  }
+}
+
+async function fetchPuzzlePRs() {
+  const res = await fetch(`${GITHUB_API}/repos/${REPO_OWNER}/${REPO_NAME}/pulls?state=open&per_page=50`, {
+    headers: { "Accept": "application/vnd.github+json" },
+  });
+  if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+  const prs = await res.json();
+  const enriched = await Promise.all(prs.map(async (pr) => {
+    try {
+      const fr = await fetch(`${GITHUB_API}/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${pr.number}/files`, {
+        headers: { "Accept": "application/vnd.github+json" },
+      });
+      if (!fr.ok) return null;
+      const files = await fr.json();
+      const puzzleFiles = files.filter(f =>
+        /^puzzles\/[^/]+\.json$/.test(f.filename) &&
+        !f.filename.endsWith("index.json") &&
+        f.status !== "removed"
+      );
+      if (!puzzleFiles.length) return null;
+      return { ...pr, puzzleFiles };
+    } catch (e) {
+      return null;
+    }
+  }));
+  return enriched.filter(Boolean);
+}
+
+async function renderReviewPR(num) {
+  app.innerHTML = `<p>Loading PR #${escapeHtml(num)}…</p>`;
+  try {
+    const fr = await fetch(`${GITHUB_API}/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${num}/files`, {
+      headers: { "Accept": "application/vnd.github+json" },
+    });
+    if (!fr.ok) throw new Error(`GitHub API ${fr.status}`);
+    const files = await fr.json();
+    const puzzleFiles = files.filter(f =>
+      /^puzzles\/[^/]+\.json$/.test(f.filename) &&
+      !f.filename.endsWith("index.json") &&
+      f.status !== "removed"
+    );
+    if (!puzzleFiles.length) {
+      app.innerHTML = `<p>No puzzle JSON found in this PR. <a href="#/review">Back</a></p>`;
+      return;
+    }
+    // Fetch raw content for first puzzle file
+    const f = puzzleFiles[0];
+    const raw = await fetch(f.raw_url);
+    if (!raw.ok) throw new Error("Couldn't load raw file");
+    const puzzle = await raw.json();
+    const prUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/pull/${num}`;
+
+    // Render a header + the play view below it
+    const header = document.createElement("section");
+    header.className = "review-header";
+    header.innerHTML = `
+      <p><a href="#/review">← Back to review queue</a></p>
+      <p class="muted">Reviewing <strong>${escapeHtml(f.filename)}</strong> from PR #${escapeHtml(num)}.
+      <a href="${prUrl}" target="_blank" rel="noopener">Open PR on GitHub</a> to merge or close.</p>
+    `;
+    app.replaceChildren(header);
+    // Append a play view inline
+    const playRoot = document.createElement("div");
+    app.appendChild(playRoot);
+    // Render the play template into a sub-container
+    const tpl = document.getElementById("view-play");
+    playRoot.appendChild(tpl.content.cloneNode(true));
+    // Re-init play with this puzzle (uses global $ which queries document)
+    initPlay(puzzle);
+
+    // Show JSON for sanity check
+    const dump = document.createElement("details");
+    dump.innerHTML = `<summary>Show raw JSON</summary><pre>${escapeHtml(JSON.stringify(puzzle, null, 2))}</pre>`;
+    app.appendChild(dump);
+  } catch (e) {
+    app.innerHTML = `<p>Couldn't load PR: ${escapeHtml(e.message || "")} <a href="#/review">Back</a></p>`;
+  }
 }
 
 // ---------- About ----------
