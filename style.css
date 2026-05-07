@@ -432,6 +432,7 @@ select:focus, input:focus {
   user-select: none;
   font-weight: 500;
 }
+.hint-toggle[hidden] { display: none; }
 .hint-toggle input {
   margin: 0;
   width: 16px;
