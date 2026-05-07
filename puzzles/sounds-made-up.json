@@ -1,0 +1,30 @@
+{
+  "title": "Sounds Made Up",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Just for Fun",
+  "grade": "9-10",
+  "topic": "humor",
+  "groups": [
+    {
+      "category": "Real animals (we promise)",
+      "difficulty": "yellow",
+      "words": ["PLATYPUS", "NARWHAL", "AXOLOTL", "QUOKKA"]
+    },
+    {
+      "category": "Real foods (we promise)",
+      "difficulty": "green",
+      "words": ["KUMQUAT", "RAMBUTAN", "DURIAN", "CHAYOTE"]
+    },
+    {
+      "category": "Real words that sound fake",
+      "difficulty": "blue",
+      "words": ["DISCOMBOBULATE", "LOLLYGAG", "BAMBOOZLE", "KERFUFFLE"]
+    },
+    {
+      "category": "Real medical terms (mundane meanings)",
+      "difficulty": "purple",
+      "words": ["BORBORYGMUS", "SINGULTUS", "HORRIPILATION", "STERNUTATION"]
+    }
+  ]
+}

@@ -4,26 +4,47 @@
   "language": "es",
   "subject": "Language Arts",
   "grade": "7-8",
+  "topic": "animals",
   "groups": [
     {
       "category": "Colores",
       "difficulty": "yellow",
-      "words": ["ROJO", "AZUL", "VERDE", "AMARILLO"]
+      "words": [
+        "ROJO",
+        "AZUL",
+        "VERDE",
+        "AMARILLO"
+      ]
     },
     {
       "category": "Animales de granja",
       "difficulty": "green",
-      "words": ["VACA", "CERDO", "POLLO", "OVEJA"]
+      "words": [
+        "VACA",
+        "CERDO",
+        "POLLO",
+        "OVEJA"
+      ]
     },
     {
       "category": "Días de la semana",
       "difficulty": "blue",
-      "words": ["LUNES", "MARTES", "JUEVES", "VIERNES"]
+      "words": [
+        "LUNES",
+        "MARTES",
+        "JUEVES",
+        "VIERNES"
+      ]
     },
     {
       "category": "Frutas tropicales",
       "difficulty": "purple",
-      "words": ["MANGO", "PIÑA", "PAPAYA", "GUAYABA"]
+      "words": [
+        "MANGO",
+        "PIÑA",
+        "PAPAYA",
+        "GUAYABA"
+      ]
     }
   ]
 }

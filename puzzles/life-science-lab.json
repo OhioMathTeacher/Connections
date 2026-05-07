@@ -4,26 +4,47 @@
   "language": "en",
   "subject": "Science",
   "grade": "7-8",
+  "topic": "biology",
   "groups": [
     {
       "category": "Parts of a cell",
       "difficulty": "yellow",
-      "words": ["NUCLEUS", "MEMBRANE", "CYTOPLASM", "RIBOSOME"]
+      "words": [
+        "NUCLEUS",
+        "MEMBRANE",
+        "CYTOPLASM",
+        "RIBOSOME"
+      ]
     },
     {
       "category": "Body systems",
       "difficulty": "green",
-      "words": ["SKELETAL", "MUSCULAR", "NERVOUS", "DIGESTIVE"]
+      "words": [
+        "SKELETAL",
+        "MUSCULAR",
+        "NERVOUS",
+        "DIGESTIVE"
+      ]
     },
     {
       "category": "Microscope parts",
       "difficulty": "blue",
-      "words": ["LENS", "STAGE", "MIRROR", "EYEPIECE"]
+      "words": [
+        "LENS",
+        "STAGE",
+        "MIRROR",
+        "EYEPIECE"
+      ]
     },
     {
       "category": "___ cell",
       "difficulty": "purple",
-      "words": ["PRISON", "BLOOD", "SOLAR", "FUEL"]
+      "words": [
+        "PRISON",
+        "BLOOD",
+        "SOLAR",
+        "FUEL"
+      ]
     }
   ]
 }

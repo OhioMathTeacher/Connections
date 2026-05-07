@@ -4,26 +4,47 @@
   "language": "en",
   "subject": "Language Arts",
   "grade": "9-10",
+  "topic": "literature",
   "groups": [
     {
       "category": "Figurative language",
       "difficulty": "yellow",
-      "words": ["METAPHOR", "SIMILE", "HYPERBOLE", "PERSONIFICATION"]
+      "words": [
+        "METAPHOR",
+        "SIMILE",
+        "HYPERBOLE",
+        "PERSONIFICATION"
+      ]
     },
     {
       "category": "Sound devices",
       "difficulty": "green",
-      "words": ["ALLITERATION", "ASSONANCE", "ONOMATOPOEIA", "RHYME"]
+      "words": [
+        "ALLITERATION",
+        "ASSONANCE",
+        "ONOMATOPOEIA",
+        "RHYME"
+      ]
     },
     {
       "category": "Story elements",
       "difficulty": "blue",
-      "words": ["PLOT", "SETTING", "CHARACTER", "THEME"]
+      "words": [
+        "PLOT",
+        "SETTING",
+        "CHARACTER",
+        "THEME"
+      ]
     },
     {
       "category": "Types of irony",
       "difficulty": "purple",
-      "words": ["SITUATIONAL", "DRAMATIC", "VERBAL", "COSMIC"]
+      "words": [
+        "SITUATIONAL",
+        "DRAMATIC",
+        "VERBAL",
+        "COSMIC"
+      ]
     }
   ]
 }

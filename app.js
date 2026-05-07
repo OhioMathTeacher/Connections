@@ -11,7 +11,32 @@ const LANGUAGES = [
   { code: "es", label: "Spanish" },
   { code: "zh", label: "Chinese" },
 ];
-const SUBJECTS = ["Science", "Math", "Social Studies", "Language Arts", "Mixed"];
+const SUBJECTS = ["Science", "Math", "Social Studies", "Language Arts", "Mixed", "Just for Fun"];
+
+const TOPICS = [
+  { id: "algebra",       label: "Algebra" },
+  { id: "arithmetic",    label: "Arithmetic" },
+  { id: "calculus",      label: "Calculus" },
+  { id: "geometry",      label: "Geometry" },
+  { id: "biology",       label: "Biology" },
+  { id: "chemistry",     label: "Chemistry" },
+  { id: "physics",       label: "Physics" },
+  { id: "earth-science", label: "Earth Science" },
+  { id: "geography",     label: "Geography" },
+  { id: "history",       label: "History" },
+  { id: "literature",    label: "Literature" },
+  { id: "drama",         label: "Drama" },
+  { id: "vocabulary",    label: "Vocabulary" },
+  { id: "spanish",       label: "Spanish" },
+  { id: "chinese",       label: "Chinese" },
+  { id: "animals",       label: "Animals" },
+  { id: "food",          label: "Food" },
+  { id: "movies",        label: "Movies & TV" },
+  { id: "music",         label: "Music" },
+  { id: "school",        label: "School Life" },
+  { id: "pop-culture",   label: "Pop Culture" },
+  { id: "humor",         label: "Humor" },
+];
 const GRADES = ["7-8", "9-10", "11-12"];
 
 function languageLabel(code) {
@@ -164,8 +189,9 @@ async function renderHome() {
         it.subject  ? `<span class="badge">${escapeHtml(it.subject)}</span>` : "",
         it.grade    ? `<span class="badge">Gr ${escapeHtml(it.grade)}</span>` : "",
       ].join("");
+      const iconSrc = it.topic ? `assets/icons/topics/${encodeURIComponent(it.topic)}.svg` : "assets/icons/_default.svg";
       li.innerHTML = `<a href="#/play/${encodeURIComponent(it.slug)}">
-        <img class="puzzle-icon" src="assets/icons/${encodeURIComponent(it.slug)}.svg" alt="" loading="lazy" onerror="this.src='assets/icons/_default.svg'">
+        <img class="puzzle-icon" src="${iconSrc}" alt="" loading="lazy" onerror="this.src='assets/icons/_default.svg'">
         <div class="puzzle-info">
           <div class="row-title">${escapeHtml(it.title)}</div>
           <div class="meta">${escapeHtml(it.author || "anonymous")} ${badges}</div>
@@ -236,6 +262,7 @@ async function discoverPuzzles() {
         language: p.language || "",
         subject: p.subject || "",
         grade: p.grade || "",
+        topic: p.topic || "",
       };
     } catch (e) {
       return { slug, title: slug, author: "" };
@@ -429,6 +456,7 @@ function renderBuild() {
   fillSelect($("select[name=language]"), [{ value: "", label: "Choose…" }, ...LANGUAGES.map(l => ({ value: l.code, label: l.label }))]);
   fillSelect($("select[name=subject]"),  [{ value: "", label: "Choose…" }, ...SUBJECTS.map(s => ({ value: s, label: s }))]);
   fillSelect($("select[name=grade]"),    [{ value: "", label: "Choose…" }, ...GRADES.map(g => ({ value: g, label: `Grades ${g}` }))]);
+  fillSelect($("select[name=topic]"),    [{ value: "", label: "Choose…" }, ...TOPICS.map(t => ({ value: t.id, label: t.label }))]);
   $("#btn-ai-generate").onclick = () => openGenerateDialog();
   $("#btn-preview").onclick = () => {
     const p = readForm();
@@ -512,6 +540,7 @@ function readForm() {
     language: String(fd.get("language") || "").trim(),
     subject: String(fd.get("subject") || "").trim(),
     grade: String(fd.get("grade") || "").trim(),
+    topic: String(fd.get("topic") || "").trim(),
     groups,
   };
 }
@@ -786,19 +815,22 @@ async function runGenerate() {
   const language = String(fd.get("language") || "");
   const subject = String(fd.get("subject") || "");
   const grade = String(fd.get("grade") || "");
+  const formTopic = String(fd.get("topic") || "");
   if (!language || !subject || !grade) {
     $("#gen-status").textContent = "Please choose language, subject, and grade level on the form first.";
     return;
   }
-  const topic = $("#gen-topic").value.trim();
-  const prompt = buildPrompt({ language, subject, grade, topic });
+  const topicHint = $("#gen-topic").value.trim();
+  const prompt = buildPrompt({ language, subject, grade, topicHint, formTopic });
 
   $("#gen-go").disabled = true;
   $("#gen-status").textContent = "Generating… this can take 5–20 seconds.";
   try {
     const text = await provider.generate(key, prompt);
     const puzzle = parsePuzzleJSON(text);
-    fillBuildFormFromPuzzle({ ...puzzle, language, subject, grade });
+    // Prefer the user's explicit topic; otherwise use whatever the AI picked, falling back to nothing
+    const topic = formTopic || (TOPICS.find(t => t.id === puzzle.topic) ? puzzle.topic : "");
+    fillBuildFormFromPuzzle({ ...puzzle, language, subject, grade, topic });
     $("#gen-status").textContent = "✓ Generated — review and edit before submitting.";
     setTimeout(() => $("#gen-dialog").close(), 600);
   } catch (e) {
@@ -809,13 +841,18 @@ async function runGenerate() {
   }
 }
 
-function buildPrompt({ language, subject, grade, topic }) {
+function buildPrompt({ language, subject, grade, topicHint, formTopic }) {
   const langName = languageLabel(language);
+  const topicList = TOPICS.map(t => t.id).join(", ");
+  const topicLine = formTopic
+    ? `- Topic: "${formTopic}" (use this exact id)`
+    : `- Topic: pick the single best matching id from this list and put it in the JSON: ${topicList}`;
   return `You are generating a Connections-style word puzzle for students.
 
 Output ONLY a single JSON object — no markdown fences, no commentary. Schema:
 {
   "title": "short title in ${langName}",
+  "topic": "one id from the topic list below",
   "groups": [
     {"category": "label", "difficulty": "yellow", "words": ["A","B","C","D"]},
     {"category": "label", "difficulty": "green",  "words": ["A","B","C","D"]},
@@ -828,7 +865,8 @@ Constraints:
 - All puzzle text (title, category labels, words) must be in ${langName}.
 - Subject area: ${subject}
 - Grade level: ${grade}
-- Topic hint (may be empty): ${topic || "(none — pick something fitting)"}
+${topicLine}
+- Topic hint from user (may be empty): ${topicHint || "(none — pick something fitting)"}
 - Yellow = easiest category, Green = moderate, Blue = challenging, Purple = hardest (often wordplay or trickier links).
 - Exactly 4 groups, each with exactly 4 words.
 - CRITICAL: All 16 words must be unique. No word may appear in two categories. Double-check before returning.
@@ -872,6 +910,7 @@ function fillBuildFormFromPuzzle(p) {
   if (p.language) f.elements["language"].value = p.language;
   if (p.subject) f.elements["subject"].value = p.subject;
   if (p.grade) f.elements["grade"].value = p.grade;
+  if (p.topic) f.elements["topic"].value = p.topic;
   for (let gi = 0; gi < 4; gi++) {
     const g = p.groups[gi];
     f.elements[`cat${gi}`].value = g.category || "";

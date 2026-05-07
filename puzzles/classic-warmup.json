@@ -4,26 +4,47 @@
   "language": "en",
   "subject": "Mixed",
   "grade": "7-8",
+  "topic": "humor",
   "groups": [
     {
       "category": "Planets",
       "difficulty": "yellow",
-      "words": ["MERCURY", "VENUS", "EARTH", "MARS"]
+      "words": [
+        "MERCURY",
+        "VENUS",
+        "EARTH",
+        "MARS"
+      ]
     },
     {
       "category": "Citrus fruits",
       "difficulty": "green",
-      "words": ["LEMON", "LIME", "ORANGE", "GRAPEFRUIT"]
+      "words": [
+        "LEMON",
+        "LIME",
+        "ORANGE",
+        "GRAPEFRUIT"
+      ]
     },
     {
       "category": "Chess pieces",
       "difficulty": "blue",
-      "words": ["KNIGHT", "BISHOP", "ROOK", "PAWN"]
+      "words": [
+        "KNIGHT",
+        "BISHOP",
+        "ROOK",
+        "PAWN"
+      ]
     },
     {
       "category": "___ ball",
       "difficulty": "purple",
-      "words": ["BASE", "FOOT", "EYE", "SNOW"]
+      "words": [
+        "BASE",
+        "FOOT",
+        "EYE",
+        "SNOW"
+      ]
     }
   ]
 }

@@ -4,26 +4,47 @@
   "language": "en",
   "subject": "Language Arts",
   "grade": "11-12",
+  "topic": "drama",
   "groups": [
     {
       "category": "Shakespearean tragedies",
       "difficulty": "yellow",
-      "words": ["HAMLET", "MACBETH", "OTHELLO", "LEAR"]
+      "words": [
+        "HAMLET",
+        "MACBETH",
+        "OTHELLO",
+        "LEAR"
+      ]
     },
     {
       "category": "Comedy heroines",
       "difficulty": "green",
-      "words": ["VIOLA", "ROSALIND", "BEATRICE", "PORTIA"]
+      "words": [
+        "VIOLA",
+        "ROSALIND",
+        "BEATRICE",
+        "PORTIA"
+      ]
     },
     {
       "category": "Kings in history plays",
       "difficulty": "blue",
-      "words": ["HENRY", "RICHARD", "JOHN", "EDWARD"]
+      "words": [
+        "HENRY",
+        "RICHARD",
+        "JOHN",
+        "EDWARD"
+      ]
     },
     {
       "category": "Sonnet terminology",
       "difficulty": "purple",
-      "words": ["SONNET", "IAMBIC", "COUPLET", "QUATRAIN"]
+      "words": [
+        "SONNET",
+        "IAMBIC",
+        "COUPLET",
+        "QUATRAIN"
+      ]
     }
   ]
 }

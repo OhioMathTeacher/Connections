@@ -4,26 +4,47 @@
   "language": "en",
   "subject": "Math",
   "grade": "7-8",
+  "topic": "arithmetic",
   "groups": [
     {
       "category": "Place values",
       "difficulty": "yellow",
-      "words": ["ONES", "TENS", "HUNDREDS", "THOUSANDS"]
+      "words": [
+        "ONES",
+        "TENS",
+        "HUNDREDS",
+        "THOUSANDS"
+      ]
     },
     {
       "category": "Results of operations",
       "difficulty": "green",
-      "words": ["SUM", "DIFFERENCE", "PRODUCT", "QUOTIENT"]
+      "words": [
+        "SUM",
+        "DIFFERENCE",
+        "PRODUCT",
+        "QUOTIENT"
+      ]
     },
     {
       "category": "Polygons",
       "difficulty": "blue",
-      "words": ["TRIANGLE", "SQUARE", "PENTAGON", "HEXAGON"]
+      "words": [
+        "TRIANGLE",
+        "SQUARE",
+        "PENTAGON",
+        "HEXAGON"
+      ]
     },
     {
       "category": "Things you can measure",
       "difficulty": "purple",
-      "words": ["LENGTH", "WEIGHT", "VOLUME", "TIME"]
+      "words": [
+        "LENGTH",
+        "WEIGHT",
+        "VOLUME",
+        "TIME"
+      ]
     }
   ]
 }

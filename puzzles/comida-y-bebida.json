@@ -4,26 +4,47 @@
   "language": "es",
   "subject": "Language Arts",
   "grade": "7-8",
+  "topic": "food",
   "groups": [
     {
       "category": "Frutas",
       "difficulty": "yellow",
-      "words": ["MANZANA", "PLÁTANO", "NARANJA", "FRESA"]
+      "words": [
+        "MANZANA",
+        "PLÁTANO",
+        "NARANJA",
+        "FRESA"
+      ]
     },
     {
       "category": "Bebidas",
       "difficulty": "green",
-      "words": ["AGUA", "LECHE", "JUGO", "CAFÉ"]
+      "words": [
+        "AGUA",
+        "LECHE",
+        "JUGO",
+        "CAFÉ"
+      ]
     },
     {
       "category": "Comidas",
       "difficulty": "blue",
-      "words": ["PIZZA", "TACO", "HAMBURGUESA", "ENSALADA"]
+      "words": [
+        "PIZZA",
+        "TACO",
+        "HAMBURGUESA",
+        "ENSALADA"
+      ]
     },
     {
       "category": "Postres",
       "difficulty": "purple",
-      "words": ["HELADO", "FLAN", "GALLETA", "PASTEL"]
+      "words": [
+        "HELADO",
+        "FLAN",
+        "GALLETA",
+        "PASTEL"
+      ]
     }
   ]
 }

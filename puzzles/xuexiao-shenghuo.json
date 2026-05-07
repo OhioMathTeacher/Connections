@@ -4,26 +4,47 @@
   "language": "zh",
   "subject": "Language Arts",
   "grade": "7-8",
+  "topic": "school",
   "groups": [
     {
       "category": "学习用品",
       "difficulty": "yellow",
-      "words": ["书", "笔", "本子", "橡皮"]
+      "words": [
+        "书",
+        "笔",
+        "本子",
+        "橡皮"
+      ]
     },
     {
       "category": "科目",
       "difficulty": "green",
-      "words": ["数学", "科学", "历史", "语文"]
+      "words": [
+        "数学",
+        "科学",
+        "历史",
+        "语文"
+      ]
     },
     {
       "category": "学校的人",
       "difficulty": "blue",
-      "words": ["老师", "学生", "校长", "同学"]
+      "words": [
+        "老师",
+        "学生",
+        "校长",
+        "同学"
+      ]
     },
     {
       "category": "教室里的东西",
       "difficulty": "purple",
-      "words": ["黑板", "桌子", "椅子", "窗户"]
+      "words": [
+        "黑板",
+        "桌子",
+        "椅子",
+        "窗户"
+      ]
     }
   ]
 }
