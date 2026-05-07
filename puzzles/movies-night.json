@@ -1,0 +1,26 @@
+{
+  "title": "Movies Night",
+  "author": "Connections Builder",
+  "groups": [
+    {
+      "category": "Tom Hanks movies",
+      "difficulty": "yellow",
+      "words": ["BIG", "CAST AWAY", "SPLASH", "PHILADELPHIA"]
+    },
+    {
+      "category": "Pixar films",
+      "difficulty": "green",
+      "words": ["UP", "CARS", "COCO", "BRAVE"]
+    },
+    {
+      "category": "Hitchcock films",
+      "difficulty": "blue",
+      "words": ["PSYCHO", "VERTIGO", "REBECCA", "ROPE"]
+    },
+    {
+      "category": "One-word horror titles",
+      "difficulty": "purple",
+      "words": ["IT", "JAWS", "CARRIE", "SAW"]
+    }
+  ]
+}

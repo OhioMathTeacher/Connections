@@ -1,0 +1,26 @@
+{
+  "title": "Classic Warm-up",
+  "author": "Connections Builder",
+  "groups": [
+    {
+      "category": "Planets",
+      "difficulty": "yellow",
+      "words": ["MERCURY", "VENUS", "EARTH", "MARS"]
+    },
+    {
+      "category": "Citrus fruits",
+      "difficulty": "green",
+      "words": ["LEMON", "LIME", "ORANGE", "GRAPEFRUIT"]
+    },
+    {
+      "category": "Chess pieces",
+      "difficulty": "blue",
+      "words": ["KNIGHT", "BISHOP", "ROOK", "PAWN"]
+    },
+    {
+      "category": "___ ball",
+      "difficulty": "purple",
+      "words": ["BASE", "FOOT", "EYE", "SNOW"]
+    }
+  ]
+}
