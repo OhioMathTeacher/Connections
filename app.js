@@ -51,6 +51,7 @@ const I18N = {
     submit: "Submit",
     mistakes: "Mistakes:",
     showHints: "Show hints",
+    relaxedMode: "Relaxed mode",
     nice: "Nice!",
     oneAway: "One away…",
     notQuite: "Not quite.",
@@ -64,6 +65,7 @@ const I18N = {
     submit: "Enviar",
     mistakes: "Errores:",
     showHints: "Mostrar pistas",
+    relaxedMode: "Modo relajado",
     nice: "¡Muy bien!",
     oneAway: "Falta uno…",
     notQuite: "Casi.",
@@ -77,6 +79,7 @@ const I18N = {
     submit: "提交",
     mistakes: "错误:",
     showHints: "显示提示",
+    relaxedMode: "轻松模式",
     nice: "不错!",
     oneAway: "差一个…",
     notQuite: "不对。",
@@ -335,6 +338,11 @@ function initPlay(puzzle) {
     hintCheckbox.checked = false;
   }
 
+  // Relaxed mode toggle: always available, persisted across sessions
+  $("#relax-toggle-text").textContent = t(lang, "relaxedMode");
+  const relaxCheckbox = $("#toggle-relaxed");
+  relaxCheckbox.checked = localStorage.getItem("clique.relaxedOn") === "1";
+
   const state = {
     puzzle,
     remaining: [],   // [{word, groupIndex}]
@@ -370,6 +378,10 @@ function initPlay(puzzle) {
       drawBoard(state);
     };
   }
+  relaxCheckbox.onchange = () => {
+    localStorage.setItem("clique.relaxedOn", relaxCheckbox.checked ? "1" : "0");
+    drawBoard(state);
+  };
 }
 
 function drawBoard(state) {
@@ -381,16 +393,22 @@ function drawBoard(state) {
   for (const gi of state.solvedGroups) {
     const g = state.puzzle.groups[gi];
     const row = document.createElement("div");
-    row.className = "solved-row " + DIFFICULTIES[gi];
-    row.innerHTML = `<div class="cat">${escapeHtml(g.category)}</div><div class="words">${g.words.map(w => escapeHtml(w.toUpperCase())).join(", ")}</div>`;
+    row.className = "solved-row " + DIFFICULTIES[gi] + (state.puzzle.pictograph ? " pictograph" : "");
+    const wordsHTML = state.puzzle.pictograph
+      ? g.words.map(w => escapeHtml(w)).join(" ")
+      : g.words.map(w => escapeHtml(w.toUpperCase())).join(", ");
+    row.innerHTML = `<div class="cat">${escapeHtml(g.category)}</div><div class="words">${wordsHTML}</div>`;
     solved.appendChild(row);
   }
 
   const hintsOn = $("#toggle-hints")?.checked && state.puzzle.hints;
+  const isPictograph = !!state.puzzle.pictograph;
   for (const item of state.remaining) {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "tile" + (state.selected.has(item.word) ? " selected" : "");
+    btn.className = "tile"
+      + (state.selected.has(item.word) ? " selected" : "")
+      + (isPictograph ? " pictograph" : "");
     btn.textContent = item.word;
     btn.disabled = state.over;
     if (hintsOn) {
@@ -415,6 +433,10 @@ function drawBoard(state) {
   }
 
   $("#btn-submit").disabled = state.selected.size !== 4 || state.over;
+  // Hide the mistakes counter entirely in relaxed mode — no anxiety from a ticking dial.
+  const relaxed = $("#toggle-relaxed")?.checked;
+  const mistakesEl = $(".mistakes");
+  if (mistakesEl) mistakesEl.style.visibility = relaxed ? "hidden" : "";
   drawMistakes(state);
 }
 
@@ -452,14 +474,15 @@ function submitGuess(state) {
     return;
   }
 
-  state.mistakes++;
+  const relaxed = $("#toggle-relaxed")?.checked;
+  if (!relaxed) state.mistakes++;
   const max = Math.max(...Object.values(counts));
   $$(".tile").forEach(t => {
     if (state.selected.has(t.textContent)) t.classList.add("shake");
   });
   setTimeout(() => $$(".tile.shake").forEach(t => t.classList.remove("shake")), 450);
 
-  if (state.mistakes >= state.maxMistakes) {
+  if (!relaxed && state.mistakes >= state.maxMistakes) {
     state.over = true;
     // reveal remaining
     const remainingGroups = [0,1,2,3].filter(gi => !state.solvedGroups.includes(gi));

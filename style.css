@@ -378,6 +378,19 @@ select:focus, input:focus {
 .tile:active { transform: translateY(0) scale(0.98); }
 .tile:disabled { cursor: default; }
 
+.tile.pictograph {
+  font-size: 2.4rem;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.solved-row.pictograph .words {
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  opacity: 1;
+}
+
 .tile.with-hint { position: relative; }
 .tile.with-hint::after {
   content: attr(data-hint);

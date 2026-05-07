@@ -1,0 +1,49 @@
+{
+  "title": "Picture This",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Just for Fun",
+  "grade": "7-8",
+  "topic": "humor",
+  "pictograph": true,
+  "groups": [
+    {
+      "category": "Animals",
+      "difficulty": "yellow",
+      "words": ["🐶", "🐱", "🐰", "🐼"]
+    },
+    {
+      "category": "Foods",
+      "difficulty": "green",
+      "words": ["🍕", "🍔", "🍣", "🌮"]
+    },
+    {
+      "category": "Sports",
+      "difficulty": "blue",
+      "words": ["⚽", "🏀", "🎾", "🏈"]
+    },
+    {
+      "category": "Weather",
+      "difficulty": "purple",
+      "words": ["☀️", "🌧️", "❄️", "⚡"]
+    }
+  ],
+  "hints": {
+    "🐶": "Dog",
+    "🐱": "Cat",
+    "🐰": "Rabbit",
+    "🐼": "Panda",
+    "🍕": "Pizza",
+    "🍔": "Burger",
+    "🍣": "Sushi",
+    "🌮": "Taco",
+    "⚽": "Soccer ball",
+    "🏀": "Basketball",
+    "🎾": "Tennis ball",
+    "🏈": "Football",
+    "☀️": "Sun",
+    "🌧️": "Rain",
+    "❄️": "Snowflake",
+    "⚡": "Lightning"
+  }
+}
