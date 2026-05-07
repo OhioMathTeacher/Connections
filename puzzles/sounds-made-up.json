@@ -9,22 +9,60 @@
     {
       "category": "Real animals (we promise)",
       "difficulty": "yellow",
-      "words": ["PLATYPUS", "NARWHAL", "AXOLOTL", "QUOKKA"]
+      "words": [
+        "PLATYPUS",
+        "NARWHAL",
+        "AXOLOTL",
+        "QUOKKA"
+      ]
     },
     {
       "category": "Real foods (we promise)",
       "difficulty": "green",
-      "words": ["KUMQUAT", "RAMBUTAN", "DURIAN", "CHAYOTE"]
+      "words": [
+        "KUMQUAT",
+        "RAMBUTAN",
+        "DURIAN",
+        "CHAYOTE"
+      ]
     },
     {
       "category": "Real words that sound fake",
       "difficulty": "blue",
-      "words": ["DISCOMBOBULATE", "LOLLYGAG", "BAMBOOZLE", "KERFUFFLE"]
+      "words": [
+        "DISCOMBOBULATE",
+        "LOLLYGAG",
+        "BAMBOOZLE",
+        "KERFUFFLE"
+      ]
     },
     {
       "category": "Real medical terms (mundane meanings)",
       "difficulty": "purple",
-      "words": ["BORBORYGMUS", "SINGULTUS", "HORRIPILATION", "STERNUTATION"]
+      "words": [
+        "BORBORYGMUS",
+        "SINGULTUS",
+        "HORRIPILATION",
+        "STERNUTATION"
+      ]
     }
-  ]
+  ],
+  "hints": {
+    "PLATYPUS": "Egg-laying mammal with a duck-like bill",
+    "NARWHAL": "Arctic whale with a long unicorn-like tusk",
+    "AXOLOTL": "Mexican salamander that never quite grows up",
+    "QUOKKA": "Australian marsupial famous for its smile",
+    "KUMQUAT": "Tiny citrus fruit eaten whole, peel and all",
+    "RAMBUTAN": "Hairy red Southeast Asian fruit",
+    "DURIAN": "Spiky tropical fruit notorious for its smell",
+    "CHAYOTE": "Pear-shaped Latin American squash",
+    "DISCOMBOBULATE": "To confuse or throw someone off",
+    "LOLLYGAG": "To dawdle or waste time",
+    "BAMBOOZLE": "To fool or deceive",
+    "KERFUFFLE": "A commotion or fuss",
+    "BORBORYGMUS": "The rumbling sound your stomach makes",
+    "SINGULTUS": "The medical name for a hiccup",
+    "HORRIPILATION": "Goosebumps",
+    "STERNUTATION": "The medical name for sneezing"
+  }
 }

@@ -378,6 +378,55 @@ select:focus, input:focus {
 .tile:active { transform: translateY(0) scale(0.98); }
 .tile:disabled { cursor: default; }
 
+.tile.with-hint { position: relative; }
+.tile.with-hint::after {
+  content: attr(data-hint);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--fg);
+  color: var(--bg);
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  z-index: 20;
+  pointer-events: none;
+  white-space: normal;
+  width: max-content;
+  max-width: 220px;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.4;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transition: opacity 140ms var(--ease), transform 140ms var(--ease);
+}
+.tile.with-hint:hover::after,
+.tile.with-hint:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.hint-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--fg-2);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+.hint-toggle input {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
 @keyframes shake {
   0%,100% { transform: translateX(0); }
   20% { transform: translateX(-5px); }

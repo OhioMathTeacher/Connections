@@ -50,6 +50,7 @@ const I18N = {
     deselect: "Deselect",
     submit: "Submit",
     mistakes: "Mistakes:",
+    showHints: "Show hints",
     nice: "Nice!",
     oneAway: "One away…",
     notQuite: "Not quite.",
@@ -62,6 +63,7 @@ const I18N = {
     deselect: "Borrar",
     submit: "Enviar",
     mistakes: "Errores:",
+    showHints: "Mostrar pistas",
     nice: "¡Muy bien!",
     oneAway: "Falta uno…",
     notQuite: "Casi.",
@@ -74,6 +76,7 @@ const I18N = {
     deselect: "取消选择",
     submit: "提交",
     mistakes: "错误:",
+    showHints: "显示提示",
     nice: "不错!",
     oneAway: "差一个…",
     notQuite: "不对。",
@@ -318,6 +321,20 @@ function initPlay(puzzle) {
     mistakesEl.childNodes[0].textContent = t(lang, "mistakes") + " ";
   }
 
+  // Hint toggle: only show if this puzzle has hints
+  const hintLabel = $("#hint-toggle-label");
+  const hintCheckbox = $("#toggle-hints");
+  const hintText = $("#hint-toggle-text");
+  const hasHints = puzzle.hints && Object.keys(puzzle.hints).length > 0;
+  if (hasHints) {
+    hintLabel.hidden = false;
+    hintText.textContent = t(lang, "showHints");
+    hintCheckbox.checked = localStorage.getItem("clique.hintsOn") === "1";
+  } else {
+    hintLabel.hidden = true;
+    hintCheckbox.checked = false;
+  }
+
   const state = {
     puzzle,
     remaining: [],   // [{word, groupIndex}]
@@ -346,6 +363,13 @@ function initPlay(puzzle) {
     drawBoard(state);
   };
   $("#btn-submit").onclick = () => submitGuess(state);
+
+  if (hintCheckbox) {
+    hintCheckbox.onchange = () => {
+      localStorage.setItem("clique.hintsOn", hintCheckbox.checked ? "1" : "0");
+      drawBoard(state);
+    };
+  }
 }
 
 function drawBoard(state) {
@@ -362,12 +386,21 @@ function drawBoard(state) {
     solved.appendChild(row);
   }
 
+  const hintsOn = $("#toggle-hints")?.checked && state.puzzle.hints;
   for (const item of state.remaining) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "tile" + (state.selected.has(item.word) ? " selected" : "");
     btn.textContent = item.word;
     btn.disabled = state.over;
+    if (hintsOn) {
+      const hint = state.puzzle.hints[item.word];
+      if (hint) {
+        btn.classList.add("with-hint");
+        btn.dataset.hint = hint;
+        btn.title = hint;
+      }
+    }
     btn.onclick = () => {
       if (state.over) return;
       if (state.selected.has(item.word)) {
@@ -733,7 +766,10 @@ Output ONLY a single JSON object — no markdown fences, no commentary. Schema:
     {"category": "label", "difficulty": "green",  "words": ["A","B","C","D"]},
     {"category": "label", "difficulty": "blue",   "words": ["A","B","C","D"]},
     {"category": "label", "difficulty": "purple", "words": ["A","B","C","D"]}
-  ]
+  ],
+  "hints": {
+    "WORD": "short, definitional clue that gives just enough to recognize the word"
+  }
 }
 
 Constraints:
@@ -749,6 +785,7 @@ ${topicLine}
 - Words should be UPPERCASE.
 - Keep content school-appropriate.
 - Make the categories specific enough to be solvable by students at the stated grade level.
+- Include a "hints" object that maps every uppercase word to a short clue (8–18 words) in ${langName}. Hints should help a stuck student recognize the word without revealing the category. Definitions, synonyms, or quick descriptions work best.
 
 Return only the JSON object.`;
 }

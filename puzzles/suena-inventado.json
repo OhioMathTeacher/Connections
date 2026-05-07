@@ -9,22 +9,60 @@
     {
       "category": "Animales raros (de verdad)",
       "difficulty": "yellow",
-      "words": ["ORNITORRINCO", "AJOLOTE", "NARVAL", "QUOKKA"]
+      "words": [
+        "ORNITORRINCO",
+        "AJOLOTE",
+        "NARVAL",
+        "QUOKKA"
+      ]
     },
     {
       "category": "Frutas exóticas (de verdad)",
       "difficulty": "green",
-      "words": ["GUANÁBANA", "CHIRIMOYA", "MARACUYÁ", "RAMBUTÁN"]
+      "words": [
+        "GUANÁBANA",
+        "CHIRIMOYA",
+        "MARACUYÁ",
+        "RAMBUTÁN"
+      ]
     },
     {
       "category": "Onomatopeyas",
       "difficulty": "blue",
-      "words": ["PUM", "ZAS", "BOOM", "CRAC"]
+      "words": [
+        "PUM",
+        "ZAS",
+        "BOOM",
+        "CRAC"
+      ]
     },
     {
       "category": "Palabras que suenan inventadas",
       "difficulty": "purple",
-      "words": ["CACHIVACHE", "CHIRIMBOLO", "ZAFARRANCHO", "BIRRIA"]
+      "words": [
+        "CACHIVACHE",
+        "CHIRIMBOLO",
+        "ZAFARRANCHO",
+        "BIRRIA"
+      ]
     }
-  ]
+  ],
+  "hints": {
+    "ORNITORRINCO": "Mamífero australiano con pico de pato",
+    "AJOLOTE": "Salamandra mexicana que no llega a adulta",
+    "NARVAL": "Ballena ártica con un colmillo largo",
+    "QUOKKA": "Marsupial australiano que parece sonreír",
+    "GUANÁBANA": "Fruta tropical verde por fuera, blanca por dentro",
+    "CHIRIMOYA": "Fruta peruana de pulpa dulce y cremosa",
+    "MARACUYÁ": "Fruta de la pasión, ácida y aromática",
+    "RAMBUTÁN": "Fruta del sudeste asiático con cáscara peluda",
+    "PUM": "Sonido de un golpe fuerte",
+    "ZAS": "Sonido de algo rápido y repentino",
+    "BOOM": "Sonido de explosión",
+    "CRAC": "Sonido de algo rompiéndose",
+    "CACHIVACHE": "Trasto inútil o cosa de poco valor",
+    "CHIRIMBOLO": "Cualquier cosa cuyo nombre no recordamos",
+    "ZAFARRANCHO": "Lío, alboroto o pelea desordenada",
+    "BIRRIA": "Algo de mala calidad (o un guisado mexicano)"
+  }
 }
