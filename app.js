@@ -18,6 +18,51 @@ function languageLabel(code) {
   return (LANGUAGES.find(l => l.code === code) || {}).label || code || "—";
 }
 
+const I18N = {
+  en: {
+    by: "by",
+    shuffle: "Shuffle",
+    deselect: "Deselect",
+    submit: "Submit",
+    mistakes: "Mistakes:",
+    nice: "Nice!",
+    oneAway: "One away…",
+    notQuite: "Not quite.",
+    outOfGuesses: "Out of guesses. Better luck next time!",
+    solved: (n) => `Solved with ${n} mistake${n === 1 ? "" : "s"}! 🎉`,
+  },
+  es: {
+    by: "por",
+    shuffle: "Mezclar",
+    deselect: "Borrar",
+    submit: "Enviar",
+    mistakes: "Errores:",
+    nice: "¡Muy bien!",
+    oneAway: "Falta uno…",
+    notQuite: "Casi.",
+    outOfGuesses: "Sin intentos. ¡Suerte la próxima!",
+    solved: (n) => `¡Resuelto con ${n} error${n === 1 ? "" : "es"}! 🎉`,
+  },
+  zh: {
+    by: "作者",
+    shuffle: "打乱",
+    deselect: "取消选择",
+    submit: "提交",
+    mistakes: "错误:",
+    nice: "不错!",
+    oneAway: "差一个…",
+    notQuite: "不对。",
+    outOfGuesses: "机会用完了。下次再试!",
+    solved: (n) => `用了 ${n} 次错误解开了! 🎉`,
+  },
+};
+
+function t(lang, key, ...args) {
+  const dict = I18N[lang] || I18N.en;
+  const v = dict[key] !== undefined ? dict[key] : I18N.en[key];
+  return typeof v === "function" ? v(...args) : v;
+}
+
 const app = document.getElementById("app");
 
 function $(sel, root = document) { return root.querySelector(sel); }
@@ -232,8 +277,18 @@ function renderPlay(puzzle) {
 
 function initPlay(puzzle) {
   if (!validatePuzzle(puzzle)) return;
+  const lang = puzzle.language || "en";
   $("#play-title").textContent = puzzle.title || "Untitled";
-  $("#play-author").textContent = puzzle.author ? `by ${puzzle.author}` : "";
+  $("#play-author").textContent = puzzle.author ? `${t(lang, "by")} ${puzzle.author}` : "";
+
+  // Localize static button labels and "Mistakes:" text
+  $("#btn-shuffle").textContent = t(lang, "shuffle");
+  $("#btn-deselect").textContent = t(lang, "deselect");
+  $("#btn-submit").textContent = t(lang, "submit");
+  const mistakesEl = $(".mistakes");
+  if (mistakesEl) {
+    mistakesEl.childNodes[0].textContent = t(lang, "mistakes") + " ";
+  }
 
   const state = {
     puzzle,
@@ -313,6 +368,7 @@ function drawMistakes(state) {
 }
 
 function submitGuess(state) {
+  const lang = state.puzzle.language || "en";
   const picks = [...state.selected];
   const items = state.remaining.filter(r => picks.includes(r.word));
   const counts = {};
@@ -328,9 +384,9 @@ function submitGuess(state) {
     drawBoard(state);
     if (state.solvedGroups.length === 4) {
       state.over = true;
-      setMessage(`Solved with ${state.mistakes} mistake${state.mistakes === 1 ? "" : "s"}! 🎉`, "win");
+      setMessage(t(lang, "solved", state.mistakes), "win");
     } else {
-      setMessage("Nice!", "win");
+      setMessage(t(lang, "nice"), "win");
     }
     return;
   }
@@ -349,12 +405,12 @@ function submitGuess(state) {
     state.solvedGroups.push(...remainingGroups);
     state.remaining = [];
     drawBoard(state);
-    setMessage("Out of guesses. Better luck next time!", "lose");
+    setMessage(t(lang, "outOfGuesses"), "lose");
   } else if (max === 3) {
-    setMessage("One away…", "hint");
+    setMessage(t(lang, "oneAway"), "hint");
     drawMistakes(state);
   } else {
-    setMessage("Not quite.", "hint");
+    setMessage(t(lang, "notQuite"), "hint");
     drawMistakes(state);
   }
 }
