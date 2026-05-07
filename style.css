@@ -664,6 +664,22 @@ input.dup-bad {
   background: color-mix(in srgb, var(--danger) 8%, var(--surface));
 }
 
+.tips { display: flex; flex-direction: column; gap: 0.85rem; }
+.tips-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t-fast), transform var(--t-fast);
+}
+.tips-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+.tips-card h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+.tips-card p { margin: 0; color: var(--fg-2); font-size: 0.95rem; }
+
 .publish-cta {
   margin-top: 2rem;
   padding: 1.25rem;

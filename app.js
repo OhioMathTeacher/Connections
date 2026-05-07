@@ -124,7 +124,6 @@ function route() {
       const json = decodeURIComponent(escape(atob(decodeURIComponent(encoded))));
       const puzzle = JSON.parse(json);
       renderPlay(puzzle);
-      appendInlinePublishCTA(puzzle);
     } catch (e) {
       app.innerHTML = "<p>Couldn't decode that puzzle link. It may be corrupted.</p>";
     }
@@ -137,11 +136,7 @@ function route() {
   }
   if (hash === "#/build") return renderBuild();
   if (hash === "#/about") return renderAbout();
-  if (hash === "#/review") return renderReview();
-  if (hash.startsWith("#/review/")) {
-    const num = hash.slice("#/review/".length);
-    return renderReviewPR(num);
-  }
+  if (hash === "#/tips") return renderTips();
   return renderHome();
 }
 
@@ -463,19 +458,19 @@ function renderBuild() {
     if (!p) return;
     renderPlay(p);
   };
-  $("#btn-send-teacher").onclick = () => {
+  $("#btn-share").onclick = () => {
     const p = readForm();
     if (!p) return;
     const url = sharableLink(p);
     const out = $("#build-output");
     out.innerHTML = `
-      <h3>📨 Send this link to your teacher</h3>
-      <p>Copy the link below and paste it into an email or Classroom message. Your teacher will play your puzzle to make sure it's a good one, then publish it to the library.</p>
+      <h3>🔗 Share this link</h3>
+      <p>Copy the link below and send it to anyone you want to play your puzzle — over email, Classroom, text, whatever. The whole puzzle is encoded in the URL, so no account or upload is needed.</p>
       <div class="link-row">
         <input type="text" id="share-link-input" value="${escapeHtml(url)}" readonly>
         <button type="button" id="copy-link" class="primary">Copy</button>
       </div>
-      <p class="muted">Anyone with this link can play your puzzle. The answer is encoded in the URL.</p>
+      <p class="muted">Heads up: the answer is encoded in the URL, so a curious player with developer tools could decode it.</p>
     `;
     const input = $("#share-link-input");
     input.focus();
@@ -491,18 +486,26 @@ function renderBuild() {
       }
     };
   };
-  $("#btn-submit-repo").onclick = () => {
+  $("#btn-download").onclick = () => {
     const p = readForm();
     if (!p) return;
-    const url = publishToLibraryURL(p);
+    const slug = slugify(p.title);
+    const content = JSON.stringify(p, null, 2) + "\n";
+    const blob = new Blob([content], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${slug}.json`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 1000);
     const out = $("#build-output");
     out.innerHTML = `
-      <h3>🚀 Publishing to library…</h3>
-      <p>A new tab should be opening with GitHub's commit page (you may need to sign in). Click the green button at the bottom to publish.</p>
-      <p>If a tab didn't open: <a href="${url}" target="_blank" rel="noopener">click here →</a></p>
-      <p class="muted">This route is for teachers / admins. Students should use "Send to teacher" instead.</p>
+      <h3>💾 Saved!</h3>
+      <p>Your puzzle was downloaded as <code>${escapeHtml(slug)}.json</code>. Keep it safe and bring it back another day, or share the file with friends.</p>
     `;
-    window.open(url, "_blank", "noopener");
   };
 }
 
@@ -555,136 +558,8 @@ function sharableLink(puzzle) {
   return `${location.origin}${location.pathname}#/play/inline/${encodeURIComponent(b64)}`;
 }
 
-function publishToLibraryURL(puzzle) {
-  const slug = slugify(puzzle.title);
-  const filename = `puzzles/${slug}.json`;
-  const content = JSON.stringify(puzzle, null, 2) + "\n";
-  return `https://github.com/${REPO_OWNER}/${REPO_NAME}/new/${REPO_BRANCH}?filename=${encodeURIComponent(filename)}&value=${encodeURIComponent(content)}`;
-}
-
-function appendInlinePublishCTA(puzzle) {
-  const cta = document.createElement("section");
-  cta.className = "publish-cta";
-  cta.innerHTML = `
-    <h3>👩‍🏫 Teacher: looks good?</h3>
-    <p class="muted">If this puzzle is ready for the library, click below to open GitHub and publish it. (Students: ignore this — your teacher will handle it.)</p>
-    <button type="button" id="btn-inline-publish" class="primary">Publish to library</button>
-  `;
-  app.appendChild(cta);
-  $("#btn-inline-publish").onclick = () => {
-    window.open(publishToLibraryURL(puzzle), "_blank", "noopener");
-  };
-}
-
-// ---------- Review ----------
-
-async function renderReview() {
-  renderTemplate("view-review");
-  const list = $("#review-list");
-  list.innerHTML = `<li class="loading">Loading open pull requests…</li>`;
-  try {
-    const prs = await fetchPuzzlePRs();
-    if (!prs.length) {
-      list.innerHTML = `<li class="loading">No pending puzzle submissions. 🎉</li>`;
-      return;
-    }
-    list.innerHTML = "";
-    for (const pr of prs) {
-      const li = document.createElement("li");
-      const fileNames = pr.puzzleFiles.map(f => f.filename).join(", ");
-      li.innerHTML = `
-        <div class="pr-row">
-          <div class="pr-info">
-            <a href="#/review/${pr.number}"><strong>#${pr.number}: ${escapeHtml(pr.title)}</strong></a>
-            <div class="meta">by ${escapeHtml(pr.user.login)} · ${escapeHtml(fileNames)}</div>
-          </div>
-          <div class="pr-actions">
-            <a href="${pr.html_url}" target="_blank" rel="noopener">View on GitHub →</a>
-          </div>
-        </div>`;
-      list.appendChild(li);
-    }
-  } catch (e) {
-    list.innerHTML = `<li class="loading">Couldn't load PRs. ${escapeHtml(e.message || "")}</li>`;
-  }
-}
-
-async function fetchPuzzlePRs() {
-  const res = await fetch(`${GITHUB_API}/repos/${REPO_OWNER}/${REPO_NAME}/pulls?state=open&per_page=50`, {
-    headers: { "Accept": "application/vnd.github+json" },
-  });
-  if (!res.ok) throw new Error(`GitHub API ${res.status}`);
-  const prs = await res.json();
-  const enriched = await Promise.all(prs.map(async (pr) => {
-    try {
-      const fr = await fetch(`${GITHUB_API}/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${pr.number}/files`, {
-        headers: { "Accept": "application/vnd.github+json" },
-      });
-      if (!fr.ok) return null;
-      const files = await fr.json();
-      const puzzleFiles = files.filter(f =>
-        /^puzzles\/[^/]+\.json$/.test(f.filename) &&
-        !f.filename.endsWith("index.json") &&
-        f.status !== "removed"
-      );
-      if (!puzzleFiles.length) return null;
-      return { ...pr, puzzleFiles };
-    } catch (e) {
-      return null;
-    }
-  }));
-  return enriched.filter(Boolean);
-}
-
-async function renderReviewPR(num) {
-  app.innerHTML = `<p>Loading PR #${escapeHtml(num)}…</p>`;
-  try {
-    const fr = await fetch(`${GITHUB_API}/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${num}/files`, {
-      headers: { "Accept": "application/vnd.github+json" },
-    });
-    if (!fr.ok) throw new Error(`GitHub API ${fr.status}`);
-    const files = await fr.json();
-    const puzzleFiles = files.filter(f =>
-      /^puzzles\/[^/]+\.json$/.test(f.filename) &&
-      !f.filename.endsWith("index.json") &&
-      f.status !== "removed"
-    );
-    if (!puzzleFiles.length) {
-      app.innerHTML = `<p>No puzzle JSON found in this PR. <a href="#/review">Back</a></p>`;
-      return;
-    }
-    // Fetch raw content for first puzzle file
-    const f = puzzleFiles[0];
-    const raw = await fetch(f.raw_url);
-    if (!raw.ok) throw new Error("Couldn't load raw file");
-    const puzzle = await raw.json();
-    const prUrl = `https://github.com/${REPO_OWNER}/${REPO_NAME}/pull/${num}`;
-
-    // Render a header + the play view below it
-    const header = document.createElement("section");
-    header.className = "review-header";
-    header.innerHTML = `
-      <p><a href="#/review">← Back to review queue</a></p>
-      <p class="muted">Reviewing <strong>${escapeHtml(f.filename)}</strong> from PR #${escapeHtml(num)}.
-      <a href="${prUrl}" target="_blank" rel="noopener">Open PR on GitHub</a> to merge or close.</p>
-    `;
-    app.replaceChildren(header);
-    // Append a play view inline
-    const playRoot = document.createElement("div");
-    app.appendChild(playRoot);
-    // Render the play template into a sub-container
-    const tpl = document.getElementById("view-play");
-    playRoot.appendChild(tpl.content.cloneNode(true));
-    // Re-init play with this puzzle (uses global $ which queries document)
-    initPlay(puzzle);
-
-    // Show JSON for sanity check
-    const dump = document.createElement("details");
-    dump.innerHTML = `<summary>Show raw JSON</summary><pre>${escapeHtml(JSON.stringify(puzzle, null, 2))}</pre>`;
-    app.appendChild(dump);
-  } catch (e) {
-    app.innerHTML = `<p>Couldn't load PR: ${escapeHtml(e.message || "")} <a href="#/review">Back</a></p>`;
-  }
+function renderTips() {
+  renderTemplate("view-tips");
 }
 
 // ---------- About ----------
