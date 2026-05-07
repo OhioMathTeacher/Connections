@@ -423,6 +423,7 @@ function renderBuild() {
   fillSelect($("select[name=language]"), [{ value: "", label: "Choose…" }, ...LANGUAGES.map(l => ({ value: l.code, label: l.label }))]);
   fillSelect($("select[name=subject]"),  [{ value: "", label: "Choose…" }, ...SUBJECTS.map(s => ({ value: s, label: s }))]);
   fillSelect($("select[name=grade]"),    [{ value: "", label: "Choose…" }, ...GRADES.map(g => ({ value: g, label: `Grades ${g}` }))]);
+  $("#btn-ai-generate").onclick = () => openGenerateDialog();
   $("#btn-preview").onclick = () => {
     const p = readForm();
     if (!p) return;
@@ -606,5 +607,282 @@ function renderAbout() {
   if (link) link.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}`;
 }
 
+// ---------- AI puzzle generation (bring-your-own-key) ----------
+
+const PROVIDERS = [
+  {
+    id: "groq",
+    label: "Groq",
+    keyUrl: "https://console.groq.com/keys",
+    generate: (key, prompt) => callOpenAICompatible({
+      url: "https://api.groq.com/openai/v1/chat/completions",
+      key, model: "llama-3.3-70b-versatile", prompt,
+    }),
+  },
+  {
+    id: "openai",
+    label: "OpenAI",
+    keyUrl: "https://platform.openai.com/api-keys",
+    generate: (key, prompt) => callOpenAICompatible({
+      url: "https://api.openai.com/v1/chat/completions",
+      key, model: "gpt-4o-mini", prompt,
+    }),
+  },
+  {
+    id: "gemini",
+    label: "Gemini",
+    keyUrl: "https://aistudio.google.com/apikey",
+    generate: (key, prompt) => callGemini({ key, model: "gemini-2.0-flash", prompt }),
+  },
+  {
+    id: "anthropic",
+    label: "Claude",
+    keyUrl: "https://console.anthropic.com/settings/keys",
+    generate: (key, prompt) => callAnthropic({ key, model: "claude-sonnet-4-6", prompt }),
+  },
+];
+
+const KEY_PREFIX = "connections.apiKey.";
+function getKey(id) { return localStorage.getItem(KEY_PREFIX + id) || ""; }
+function setKey(id, val) {
+  if (val) localStorage.setItem(KEY_PREFIX + id, val);
+  else localStorage.removeItem(KEY_PREFIX + id);
+}
+function providersWithKeys() { return PROVIDERS.filter(p => getKey(p.id)); }
+
+// ---- Keys dialog ----
+
+function openKeysDialog() {
+  const dlg = $("#keys-dialog");
+  renderKeysGrid();
+  $("#key-editor").hidden = true;
+  dlg.showModal();
+}
+function renderKeysGrid() {
+  const grid = $("#keys-grid");
+  grid.innerHTML = "";
+  for (const p of PROVIDERS) {
+    const has = !!getKey(p.id);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "key-card";
+    btn.innerHTML = `<span>${escapeHtml(p.label)}</span><span class="status ${has ? "set" : ""}">${has ? "✓ saved" : "— add key"}</span>`;
+    btn.onclick = () => openKeyEditor(p.id);
+    grid.appendChild(btn);
+  }
+}
+function openKeyEditor(id) {
+  const p = PROVIDERS.find(x => x.id === id);
+  $("#key-editor-title").textContent = `${p.label} API key`;
+  $("#key-editor-link").href = p.keyUrl;
+  $("#key-editor-input").value = getKey(id);
+  $("#key-editor").hidden = false;
+  $("#key-editor-save").onclick = () => {
+    setKey(id, $("#key-editor-input").value.trim());
+    renderKeysGrid();
+    $("#key-editor").hidden = true;
+  };
+  $("#key-editor-remove").onclick = () => {
+    setKey(id, "");
+    renderKeysGrid();
+    $("#key-editor").hidden = true;
+  };
+  $("#key-editor-cancel").onclick = () => { $("#key-editor").hidden = true; };
+}
+
+function bindKeysUI() {
+  const openBtn = $("#open-keys");
+  const closeBtn = $("#keys-close");
+  if (openBtn) openBtn.addEventListener("click", (e) => { e.preventDefault(); openKeysDialog(); });
+  if (closeBtn) closeBtn.addEventListener("click", () => $("#keys-dialog").close());
+}
+
+// ---- Generate dialog ----
+
+function openGenerateDialog() {
+  const have = providersWithKeys();
+  if (!have.length) {
+    alert("No API keys saved yet. Click 🔑 Keys in the top nav and add one first.");
+    return;
+  }
+  const sel = $("#gen-provider");
+  fillSelect(sel, have.map(p => ({ value: p.id, label: p.label })));
+  $("#gen-topic").value = "";
+  $("#gen-status").textContent = "";
+  $("#gen-dialog").showModal();
+  $("#gen-cancel").onclick = () => $("#gen-dialog").close();
+  $("#gen-go").onclick = runGenerate;
+}
+
+async function runGenerate() {
+  const providerId = $("#gen-provider").value;
+  const provider = PROVIDERS.find(p => p.id === providerId);
+  const key = getKey(providerId);
+  if (!provider || !key) {
+    $("#gen-status").textContent = "No key for that provider.";
+    return;
+  }
+  // Pull current build form metadata
+  const fd = new FormData($("#build-form"));
+  const language = String(fd.get("language") || "");
+  const subject = String(fd.get("subject") || "");
+  const grade = String(fd.get("grade") || "");
+  if (!language || !subject || !grade) {
+    $("#gen-status").textContent = "Please choose language, subject, and grade level on the form first.";
+    return;
+  }
+  const topic = $("#gen-topic").value.trim();
+  const prompt = buildPrompt({ language, subject, grade, topic });
+
+  $("#gen-go").disabled = true;
+  $("#gen-status").textContent = "Generating… this can take 5–20 seconds.";
+  try {
+    const text = await provider.generate(key, prompt);
+    const puzzle = parsePuzzleJSON(text);
+    fillBuildFormFromPuzzle({ ...puzzle, language, subject, grade });
+    $("#gen-status").textContent = "✓ Generated — review and edit before submitting.";
+    setTimeout(() => $("#gen-dialog").close(), 600);
+  } catch (e) {
+    console.error(e);
+    $("#gen-status").textContent = "Error: " + (e.message || e);
+  } finally {
+    $("#gen-go").disabled = false;
+  }
+}
+
+function buildPrompt({ language, subject, grade, topic }) {
+  const langName = languageLabel(language);
+  return `You are generating a Connections-style word puzzle for students.
+
+Output ONLY a single JSON object — no markdown fences, no commentary. Schema:
+{
+  "title": "short title in ${langName}",
+  "groups": [
+    {"category": "label", "difficulty": "yellow", "words": ["A","B","C","D"]},
+    {"category": "label", "difficulty": "green",  "words": ["A","B","C","D"]},
+    {"category": "label", "difficulty": "blue",   "words": ["A","B","C","D"]},
+    {"category": "label", "difficulty": "purple", "words": ["A","B","C","D"]}
+  ]
+}
+
+Constraints:
+- All puzzle text (title, category labels, words) must be in ${langName}.
+- Subject area: ${subject}
+- Grade level: ${grade}
+- Topic hint (may be empty): ${topic || "(none — pick something fitting)"}
+- Yellow = easiest category, Green = moderate, Blue = challenging, Purple = hardest (often wordplay or trickier links).
+- Exactly 4 groups, each with exactly 4 words.
+- All 16 words must be unique. No word may belong to more than one category.
+- Each "word" is a single word or short phrase (max 3 words).
+- Words should be UPPERCASE.
+- Keep content school-appropriate.
+- Make the categories specific enough to be solvable by students at the stated grade level.
+
+Return only the JSON object.`;
+}
+
+function parsePuzzleJSON(text) {
+  if (!text) throw new Error("Empty response");
+  // Strip code fences if present
+  let s = text.trim();
+  s = s.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+  // Find first { and last } as a fallback
+  const first = s.indexOf("{");
+  const last = s.lastIndexOf("}");
+  if (first > 0 || last < s.length - 1) {
+    if (first !== -1 && last !== -1) s = s.slice(first, last + 1);
+  }
+  let parsed;
+  try { parsed = JSON.parse(s); }
+  catch (e) { throw new Error("Couldn't parse JSON from model: " + e.message); }
+  if (!parsed.groups || parsed.groups.length !== 4) {
+    throw new Error("Model didn't return 4 groups.");
+  }
+  const order = ["yellow", "green", "blue", "purple"];
+  parsed.groups.sort((a, b) => order.indexOf(a.difficulty) - order.indexOf(b.difficulty));
+  for (const g of parsed.groups) {
+    if (!g.words || g.words.length !== 4) throw new Error("A group is missing 4 words.");
+    g.words = g.words.map(w => String(w).toUpperCase());
+  }
+  return parsed;
+}
+
+function fillBuildFormFromPuzzle(p) {
+  const f = $("#build-form");
+  if (p.title) f.elements["title"].value = p.title;
+  if (p.language) f.elements["language"].value = p.language;
+  if (p.subject) f.elements["subject"].value = p.subject;
+  if (p.grade) f.elements["grade"].value = p.grade;
+  for (let gi = 0; gi < 4; gi++) {
+    const g = p.groups[gi];
+    f.elements[`cat${gi}`].value = g.category || "";
+    for (let wi = 0; wi < 4; wi++) {
+      f.elements[`w${gi}_${wi}`].value = (g.words[wi] || "").toUpperCase();
+    }
+  }
+}
+
+// ---- Provider API callers ----
+
+async function callOpenAICompatible({ url, key, model, prompt }) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: "You are a careful, school-appropriate puzzle author. Return only JSON when asked." },
+        { role: "user", content: prompt },
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.8,
+    }),
+  });
+  if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || "";
+}
+
+async function callGemini({ key, model, prompt }) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.8, responseMimeType: "application/json" },
+    }),
+  });
+  if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+}
+
+async function callAnthropic({ key, model, prompt }) {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": key,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 1024,
+      temperature: 0.8,
+      system: "You are a careful, school-appropriate puzzle author. Return only JSON when asked.",
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+  if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  return data.content?.[0]?.text || "";
+}
+
 // boot
+bindKeysUI();
 route();

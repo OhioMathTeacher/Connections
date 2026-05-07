@@ -14,10 +14,48 @@
     <a href="#/build">Build</a>
     <a href="#/review">Review</a>
     <a href="#/about">About</a>
+    <a href="#" id="open-keys" class="key-link">🔑 Keys</a>
   </nav>
 </header>
 
 <main id="app"></main>
+
+<dialog id="keys-dialog">
+  <form method="dialog" class="dialog-body">
+    <h3>API keys</h3>
+    <p class="muted">Pick a provider to add or update its API key. Keys are stored only in your browser (localStorage) — never uploaded.</p>
+    <div id="keys-grid" class="keys-grid"></div>
+    <div id="key-editor" class="key-editor" hidden>
+      <h4 id="key-editor-title"></h4>
+      <p class="muted"><a id="key-editor-link" href="#" target="_blank" rel="noopener">Get a key →</a></p>
+      <input type="password" id="key-editor-input" placeholder="Paste your API key">
+      <div class="buttons">
+        <button type="button" id="key-editor-cancel">Cancel</button>
+        <button type="button" id="key-editor-remove">Remove</button>
+        <button type="button" id="key-editor-save" class="primary">Save</button>
+      </div>
+    </div>
+    <div class="buttons" style="justify-content: flex-end; margin-top: 1rem;">
+      <button type="button" id="keys-close">Close</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="gen-dialog">
+  <form method="dialog" class="dialog-body">
+    <h3>✨ Generate a puzzle with AI</h3>
+    <p class="muted">Uses the language, subject, and grade level you've selected on the Build form. Add a topic hint for better results.</p>
+    <label>Provider <select id="gen-provider"></select></label>
+    <label>Topic hint (optional)
+      <input type="text" id="gen-topic" placeholder="e.g., the water cycle, WWII, fractions, poetry devices…">
+    </label>
+    <div id="gen-status" class="muted" aria-live="polite"></div>
+    <div class="buttons" style="justify-content: flex-end;">
+      <button type="button" id="gen-cancel">Cancel</button>
+      <button type="button" id="gen-go" class="primary">Generate</button>
+    </div>
+  </form>
+</dialog>
 
 <template id="view-home">
   <section class="home">
@@ -70,6 +108,11 @@
         <label>Language <select name="language" required></select></label>
         <label>Subject <select name="subject" required></select></label>
         <label>Grade level <select name="grade" required></select></label>
+      </div>
+
+      <div class="ai-row">
+        <button type="button" id="btn-ai-generate">✨ Generate with AI</button>
+        <span class="muted">Fills in the puzzle below — review and edit before submitting.</span>
       </div>
 
       <div class="groups">
