@@ -46,5 +46,23 @@
         "THETA"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "ADD": "Combine two numbers to get a sum",
+    "SUBTRACT": "Take one number away from another",
+    "MULTIPLY": "Repeated addition; finds a product",
+    "DIVIDE": "Split into equal parts; finds a quotient",
+    "VARIABLE": "Letter that stands in for an unknown value",
+    "COEFFICIENT": "The number multiplied by a variable",
+    "CONSTANT": "A fixed number that doesn't change",
+    "EXPONENT": "Tells you how many times to multiply a base by itself",
+    "RATIONAL": "Any number that can be written as a fraction",
+    "INTEGER": "A whole number, positive or negative",
+    "PRIME": "Only divisible by 1 and itself",
+    "REAL": "Any number on the number line, including irrationals",
+    "PI": "Ratio of a circle's circumference to its diameter",
+    "SIGMA": "Greek letter used to mean 'sum of'",
+    "DELTA": "Greek letter for 'change in' a value",
+    "THETA": "Greek letter often used for an angle"
+  }
 }

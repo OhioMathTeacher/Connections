@@ -46,5 +46,23 @@
         "SANTIAGO"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "PARIS": "City of Light, home of the Eiffel Tower",
+    "ROME": "Eternal City, capital of Italy",
+    "MADRID": "Capital of Spain",
+    "BERLIN": "Capital of Germany; site of the famous wall",
+    "TOKYO": "Capital of Japan",
+    "BEIJING": "Capital of China",
+    "SEOUL": "Capital of South Korea",
+    "BANGKOK": "Capital of Thailand",
+    "CAIRO": "Capital of Egypt; near the Pyramids of Giza",
+    "NAIROBI": "Capital of Kenya",
+    "ABUJA": "Capital of Nigeria",
+    "ACCRA": "Capital of Ghana",
+    "LIMA": "Capital of Peru",
+    "QUITO": "Capital of Ecuador, high in the Andes",
+    "BOGOTA": "Capital of Colombia",
+    "SANTIAGO": "Capital of Chile"
+  }
 }

@@ -46,5 +46,23 @@
         "SAW"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "BIG": "Tom Hanks plays a kid in an adult body",
+    "CAST AWAY": "Tom Hanks stranded on an island with a volleyball",
+    "SPLASH": "Tom Hanks falls for a mermaid",
+    "PHILADELPHIA": "Tom Hanks won an Oscar playing a lawyer with AIDS",
+    "UP": "Pixar film about a flying house and a boy scout",
+    "CARS": "Pixar film featuring talking race vehicles",
+    "COCO": "Pixar film set during Día de los Muertos",
+    "BRAVE": "Pixar film about a Scottish princess and her bow",
+    "PSYCHO": "Hitchcock thriller with the famous shower scene",
+    "VERTIGO": "Hitchcock film about fear of heights",
+    "REBECCA": "Hitchcock adaptation of a du Maurier novel",
+    "ROPE": "Hitchcock film shot to look like one continuous take",
+    "IT": "Stephen King novel and film about Pennywise the clown",
+    "JAWS": "Spielberg's blockbuster about a great white shark",
+    "CARRIE": "Stephen King novel about a telekinetic prom queen",
+    "SAW": "Horror franchise centered on Jigsaw's traps"
+  }
 }

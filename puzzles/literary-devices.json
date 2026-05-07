@@ -46,5 +46,23 @@
         "COSMIC"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "METAPHOR": "Direct comparison without using like or as",
+    "SIMILE": "Comparison using like or as",
+    "HYPERBOLE": "Extreme exaggeration for effect",
+    "PERSONIFICATION": "Giving human traits to non-human things",
+    "ALLITERATION": "Repetition of the same starting sound",
+    "ASSONANCE": "Repetition of vowel sounds in nearby words",
+    "ONOMATOPOEIA": "A word that imitates a sound (buzz, pop)",
+    "RHYME": "Words ending with the same sound",
+    "PLOT": "The sequence of events in a story",
+    "SETTING": "Where and when a story takes place",
+    "CHARACTER": "A person or being in a story",
+    "THEME": "The main idea or message of a story",
+    "SITUATIONAL": "When the outcome is the opposite of what's expected",
+    "DRAMATIC": "When the audience knows something the character doesn't",
+    "VERBAL": "Saying the opposite of what you mean (like sarcasm)",
+    "COSMIC": "When fate or the universe seems to mock our plans"
+  }
 }

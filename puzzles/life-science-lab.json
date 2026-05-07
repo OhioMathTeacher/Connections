@@ -46,5 +46,23 @@
         "FUEL"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "NUCLEUS": "The control center of a cell, containing DNA",
+    "MEMBRANE": "Thin barrier that surrounds a cell",
+    "CYTOPLASM": "Jelly-like substance filling a cell",
+    "RIBOSOME": "Tiny structure that builds proteins",
+    "SKELETAL": "The body system made of bones",
+    "MUSCULAR": "The body system made of muscles",
+    "NERVOUS": "The body system that includes the brain and nerves",
+    "DIGESTIVE": "The body system that processes food",
+    "LENS": "Curved glass piece that focuses light",
+    "STAGE": "Flat surface where slides are placed",
+    "MIRROR": "Surface that reflects light",
+    "EYEPIECE": "The lens you look through",
+    "PRISON": "A place where criminals are confined",
+    "BLOOD": "Red fluid that circulates in your body",
+    "SOLAR": "Relating to the sun",
+    "FUEL": "Substance burned for energy, like gasoline"
+  }
 }

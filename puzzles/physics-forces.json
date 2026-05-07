@@ -46,5 +46,23 @@
         "GIGA"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "KINETIC": "Energy of motion",
+    "POTENTIAL": "Stored energy due to position",
+    "THERMAL": "Heat energy",
+    "NUCLEAR": "Energy released by splitting or fusing atoms",
+    "METER": "SI unit of length",
+    "KILOGRAM": "SI unit of mass",
+    "SECOND": "SI unit of time",
+    "AMPERE": "SI unit of electric current",
+    "PROTON": "Positively charged particle in the nucleus",
+    "NEUTRON": "Neutral particle in the nucleus",
+    "ELECTRON": "Negatively charged particle orbiting the nucleus",
+    "QUARK": "Fundamental particle inside protons and neutrons",
+    "MEGA": "Prefix meaning one million",
+    "KILO": "Prefix meaning one thousand",
+    "NANO": "Prefix meaning one billionth",
+    "GIGA": "Prefix meaning one billion"
+  }
 }

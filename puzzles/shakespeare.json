@@ -46,5 +46,23 @@
         "QUATRAIN"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "HAMLET": "Danish prince who soliloquizes about being or not being",
+    "MACBETH": "Scottish lord whose ambition leads to murder",
+    "OTHELLO": "Moorish general manipulated by Iago",
+    "LEAR": "Aging king who divides his kingdom among his daughters",
+    "VIOLA": "Twelfth Night heroine who disguises as a man",
+    "ROSALIND": "Heroine of As You Like It who flees to the forest",
+    "BEATRICE": "Quick-witted heroine of Much Ado About Nothing",
+    "PORTIA": "Wealthy heroine of The Merchant of Venice",
+    "HENRY": "Name shared by multiple Shakespeare king plays",
+    "RICHARD": "Name shared by three Shakespeare plays about English kings",
+    "JOHN": "Subject of one of Shakespeare's lesser-known history plays",
+    "EDWARD": "English king whose play is partly attributed to Shakespeare",
+    "SONNET": "14-line poem with a fixed rhyme scheme",
+    "IAMBIC": "Metrical foot of unstressed-stressed syllables",
+    "COUPLET": "Two consecutive rhyming lines",
+    "QUATRAIN": "Four-line stanza, often with rhymes"
+  }
 }

@@ -46,5 +46,23 @@
         "PHI"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "DERIVATIVE": "Measures how a function changes; the slope of a curve",
+    "INTEGRAL": "Measures area under a curve",
+    "LIMIT": "The value a function approaches as input gets close to something",
+    "FUNCTION": "A rule that maps each input to exactly one output",
+    "SINE": "Trig function: opposite over hypotenuse",
+    "COSINE": "Trig function: adjacent over hypotenuse",
+    "TANGENT": "Trig function: opposite over adjacent",
+    "SECANT": "Reciprocal of cosine",
+    "NEWTON": "English co-inventor of calculus and discoverer of gravity",
+    "LEIBNIZ": "German co-inventor of calculus; gave us the dx notation",
+    "EULER": "Prolific Swiss mathematician; introduced the constant e",
+    "GAUSS": "Prince of mathematicians; brilliant in number theory",
+    "DELTA": "Greek letter for 'change in' a quantity",
+    "EPSILON": "Greek letter often used for a tiny positive number",
+    "LAMBDA": "Greek letter used for eigenvalues and wavelengths",
+    "PHI": "Greek letter for the golden ratio"
+  }
 }

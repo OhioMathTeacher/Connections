@@ -46,5 +46,23 @@
         "MADISON"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "BUSH": "Family name of two presidents, including the 43rd",
+    "OBAMA": "44th president, first African American to hold the office",
+    "TRUMP": "Real estate mogul who became the 45th and 47th president",
+    "BIDEN": "Long-serving senator who became the 46th president",
+    "JACKSON": "Old Hickory; 7th president and frontier general",
+    "POLK": "11th president; expanded U.S. westward via the Mexican War",
+    "FILLMORE": "13th president; signed the Compromise of 1850",
+    "PIERCE": "14th president; signed the Kansas-Nebraska Act",
+    "TRUMAN": "33rd president; ordered the atomic bombings of Japan",
+    "EISENHOWER": "Allied commander in WWII; 34th president",
+    "KENNEDY": "35th president; assassinated in Dallas in 1963",
+    "JOHNSON": "Texan who became 36th president after Kennedy's death",
+    "WASHINGTON": "First U.S. president; on the dollar bill",
+    "ADAMS": "Second U.S. president; Founding Father from Massachusetts",
+    "JEFFERSON": "Third U.S. president; primary author of the Declaration",
+    "MADISON": "Fourth U.S. president; Father of the Constitution"
+  }
 }

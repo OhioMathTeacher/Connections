@@ -46,5 +46,23 @@
         "RUNES"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "GREEK": "Ancient civilization that gave us democracy and Plato",
+    "ROMAN": "Ancient empire centered on the city of Rome",
+    "EGYPTIAN": "Civilization of pharaohs along the Nile",
+    "MAYAN": "Mesoamerican civilization known for advanced astronomy",
+    "ZEUS": "King of the Olympian gods, wielder of thunder",
+    "APOLLO": "God of the sun, music, and prophecy",
+    "ATHENA": "Goddess of wisdom; born from Zeus's head",
+    "POSEIDON": "God of the sea, brother of Zeus",
+    "PYRAMIDS": "Massive stone tombs at Giza",
+    "COLOSSEUM": "Roman amphitheater famous for gladiator games",
+    "PETRA": "Rose-red city carved into rock cliffs in Jordan",
+    "STONEHENGE": "Prehistoric ring of standing stones in England",
+    "CUNEIFORM": "Wedge-shaped writing pressed into clay tablets",
+    "HIEROGLYPHS": "Egyptian picture-based writing system",
+    "SANSKRIT": "Ancient Indian language of sacred Hindu texts",
+    "RUNES": "Letters of Old Norse and Germanic alphabets"
+  }
 }

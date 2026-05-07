@@ -46,5 +46,23 @@
         "TIME"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "ONES": "The rightmost place value in a whole number",
+    "TENS": "The second place value from the right",
+    "HUNDREDS": "The third place value from the right",
+    "THOUSANDS": "The fourth place value from the right",
+    "SUM": "The result of adding numbers",
+    "DIFFERENCE": "The result of subtracting numbers",
+    "PRODUCT": "The result of multiplying numbers",
+    "QUOTIENT": "The result of dividing numbers",
+    "TRIANGLE": "Polygon with three sides",
+    "SQUARE": "Polygon with four equal sides and right angles",
+    "PENTAGON": "Polygon with five sides",
+    "HEXAGON": "Polygon with six sides",
+    "LENGTH": "How long something is, measured in distance",
+    "WEIGHT": "How heavy something is",
+    "VOLUME": "How much space something takes up",
+    "TIME": "Measured in seconds, minutes, and hours"
+  }
 }

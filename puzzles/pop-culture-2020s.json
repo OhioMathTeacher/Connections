@@ -46,5 +46,23 @@
         "SAUCE"
       ]
     }
-  ]
+  ],
+  "hints": {
+    "NETFLIX": "Red-logo streaming service known for original series",
+    "HULU": "Streaming service co-owned by Disney",
+    "DISNEY": "Streaming home of Marvel, Star Wars, and Pixar",
+    "SPOTIFY": "Green-logo music streaming service",
+    "INSTAGRAM": "Photo-sharing app owned by Meta",
+    "TIKTOK": "Short-form video app from ByteDance",
+    "SNAPCHAT": "App known for disappearing photos",
+    "TWITTER": "Microblogging platform now called X",
+    "STARK": "Tony, played by Robert Downey Jr.",
+    "THOR": "Asgardian wielder of Mjolnir",
+    "BANNER": "Bruce, the scientist who becomes the Hulk",
+    "ROGERS": "Steve, also known as Captain America",
+    "WATCH": "Wristworn timepiece",
+    "PIE": "Sweet baked dessert with a crust",
+    "JUICE": "Liquid pressed from fruit",
+    "SAUCE": "Liquid condiment served with food"
+  }
 }
