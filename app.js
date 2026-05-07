@@ -99,6 +99,7 @@ function route() {
       const json = decodeURIComponent(escape(atob(decodeURIComponent(encoded))));
       const puzzle = JSON.parse(json);
       renderPlay(puzzle);
+      appendInlinePublishCTA(puzzle);
     } catch (e) {
       app.innerHTML = "<p>Couldn't decode that puzzle link. It may be corrupted.</p>";
     }
@@ -429,29 +430,46 @@ function renderBuild() {
     if (!p) return;
     renderPlay(p);
   };
-  $("#btn-share-link").onclick = () => {
+  $("#btn-send-teacher").onclick = () => {
     const p = readForm();
     if (!p) return;
-    const json = JSON.stringify(p);
-    const b64 = btoa(unescape(encodeURIComponent(json)));
-    const url = `${location.origin}${location.pathname}#/play/inline/${encodeURIComponent(b64)}`;
+    const url = sharableLink(p);
     const out = $("#build-output");
-    out.innerHTML = `<p><strong>Share this link:</strong></p><p><a href="${url}">${escapeHtml(url)}</a></p><p class="muted">Anyone with this link can play. Note: the answer is encoded in the URL, so a curious player could decode it.</p>`;
+    out.innerHTML = `
+      <h3>📨 Send this link to your teacher</h3>
+      <p>Copy the link below and paste it into an email or Classroom message. Your teacher will play your puzzle to make sure it's a good one, then publish it to the library.</p>
+      <div class="link-row">
+        <input type="text" id="share-link-input" value="${escapeHtml(url)}" readonly>
+        <button type="button" id="copy-link" class="primary">Copy</button>
+      </div>
+      <p class="muted">Anyone with this link can play your puzzle. The answer is encoded in the URL.</p>
+    `;
+    const input = $("#share-link-input");
+    input.focus();
+    input.select();
+    $("#copy-link").onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        $("#copy-link").textContent = "Copied ✓";
+        setTimeout(() => { $("#copy-link").textContent = "Copy"; }, 1500);
+      } catch (e) {
+        input.select();
+        document.execCommand("copy");
+      }
+    };
   };
   $("#btn-submit-repo").onclick = () => {
     const p = readForm();
     if (!p) return;
-    const slug = slugify(p.title);
-    const filename = `puzzles/${slug}.json`;
-    const content = JSON.stringify(p, null, 2) + "\n";
-    const url = `https://github.com/${REPO_OWNER}/${REPO_NAME}/new/${REPO_BRANCH}?filename=${encodeURIComponent(filename)}&value=${encodeURIComponent(content)}`;
+    const url = publishToLibraryURL(p);
     const out = $("#build-output");
     out.innerHTML = `
-      <h3>Submit to repo</h3>
-      <p><a href="${url}" target="_blank" rel="noopener">Open the pre-filled new-file page on GitHub →</a></p>
-      <p class="muted">Click "Propose new file" / "Commit changes". A maintainer will review your puzzle on the Review page and merge it. Once merged, it appears on the Play list automatically — no other steps needed.</p>
-      <details><summary>Or copy the JSON manually</summary><pre>${escapeHtml(content)}</pre></details>
+      <h3>🚀 Publishing to library…</h3>
+      <p>A new tab should be opening with GitHub's commit page (you may need to sign in). Click the green button at the bottom to publish.</p>
+      <p>If a tab didn't open: <a href="${url}" target="_blank" rel="noopener">click here →</a></p>
+      <p class="muted">This route is for teachers / admins. Students should use "Send to teacher" instead.</p>
     `;
+    window.open(url, "_blank", "noopener");
   };
 }
 
@@ -467,11 +485,20 @@ function readForm() {
       words: [0,1,2,3].map(wi => String(fd.get(`w${gi}_${wi}`)).trim().toUpperCase()),
     });
   }
-  // Check for duplicate words across the whole puzzle
+  // Check for duplicate or empty words across the whole puzzle
   const all = groups.flatMap(g => g.words);
-  const dup = all.find((w, i) => all.indexOf(w) !== i);
+  $$('#build-form input.dup-bad').forEach(el => el.classList.remove('dup-bad'));
+  const dup = all.find((w, i) => w && all.indexOf(w) !== i);
   if (dup) {
-    alert(`Duplicate word: ${dup}. Each word must be unique.`);
+    // Highlight every cell containing the dup word
+    $$("#build-form input").forEach(el => {
+      if (el.value.trim().toUpperCase() === dup) el.classList.add('dup-bad');
+    });
+    alert(`"${dup}" appears more than once. Each word in the puzzle must be unique — the duplicates are highlighted in red.`);
+    return null;
+  }
+  if (all.some(w => !w)) {
+    alert("Every word slot must be filled before submitting.");
     return null;
   }
   return {
@@ -486,6 +513,33 @@ function readForm() {
 
 function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50) || "puzzle";
+}
+
+function sharableLink(puzzle) {
+  const json = JSON.stringify(puzzle);
+  const b64 = btoa(unescape(encodeURIComponent(json)));
+  return `${location.origin}${location.pathname}#/play/inline/${encodeURIComponent(b64)}`;
+}
+
+function publishToLibraryURL(puzzle) {
+  const slug = slugify(puzzle.title);
+  const filename = `puzzles/${slug}.json`;
+  const content = JSON.stringify(puzzle, null, 2) + "\n";
+  return `https://github.com/${REPO_OWNER}/${REPO_NAME}/new/${REPO_BRANCH}?filename=${encodeURIComponent(filename)}&value=${encodeURIComponent(content)}`;
+}
+
+function appendInlinePublishCTA(puzzle) {
+  const cta = document.createElement("section");
+  cta.className = "publish-cta";
+  cta.innerHTML = `
+    <h3>👩‍🏫 Teacher: looks good?</h3>
+    <p class="muted">If this puzzle is ready for the library, click below to open GitHub and publish it. (Students: ignore this — your teacher will handle it.)</p>
+    <button type="button" id="btn-inline-publish" class="primary">Publish to library</button>
+  `;
+  app.appendChild(cta);
+  $("#btn-inline-publish").onclick = () => {
+    window.open(publishToLibraryURL(puzzle), "_blank", "noopener");
+  };
 }
 
 // ---------- Review ----------
@@ -772,7 +826,7 @@ Constraints:
 - Topic hint (may be empty): ${topic || "(none — pick something fitting)"}
 - Yellow = easiest category, Green = moderate, Blue = challenging, Purple = hardest (often wordplay or trickier links).
 - Exactly 4 groups, each with exactly 4 words.
-- All 16 words must be unique. No word may belong to more than one category.
+- CRITICAL: All 16 words must be unique. No word may appear in two categories. Double-check before returning.
 - Each "word" is a single word or short phrase (max 3 words).
 - Words should be UPPERCASE.
 - Keep content school-appropriate.
