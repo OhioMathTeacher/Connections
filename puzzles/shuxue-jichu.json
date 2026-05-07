@@ -1,0 +1,30 @@
+{
+  "title": "数学基础",
+  "author": "Connections Builder",
+  "language": "zh",
+  "subject": "Math",
+  "grade": "7-8",
+  "topic": "arithmetic",
+  "groups": [
+    {
+      "category": "数字",
+      "difficulty": "yellow",
+      "words": ["五", "六", "七", "八"]
+    },
+    {
+      "category": "运算",
+      "difficulty": "green",
+      "words": ["加", "减", "乘", "除"]
+    },
+    {
+      "category": "形状",
+      "difficulty": "blue",
+      "words": ["圆形", "方形", "三角形", "长方形"]
+    },
+    {
+      "category": "测量单位",
+      "difficulty": "purple",
+      "words": ["米", "升", "克", "秒"]
+    }
+  ]
+}

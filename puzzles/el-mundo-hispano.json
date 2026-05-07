@@ -1,0 +1,30 @@
+{
+  "title": "El Mundo Hispano",
+  "author": "Connections Builder",
+  "language": "es",
+  "subject": "Social Studies",
+  "grade": "11-12",
+  "topic": "geography",
+  "groups": [
+    {
+      "category": "Continentes",
+      "difficulty": "yellow",
+      "words": ["EUROPA", "AMÉRICA", "ÁFRICA", "ASIA"]
+    },
+    {
+      "category": "Países hispanohablantes",
+      "difficulty": "green",
+      "words": ["MÉXICO", "ESPAÑA", "ARGENTINA", "CUBA"]
+    },
+    {
+      "category": "Capitales",
+      "difficulty": "blue",
+      "words": ["MADRID", "BUENOS AIRES", "LIMA", "CARACAS"]
+    },
+    {
+      "category": "Lenguas oficiales",
+      "difficulty": "purple",
+      "words": ["ESPAÑOL", "INGLÉS", "PORTUGUÉS", "FRANCÉS"]
+    }
+  ]
+}

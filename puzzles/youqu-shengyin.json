@@ -1,0 +1,30 @@
+{
+  "title": "有趣的声音",
+  "author": "Connections Builder",
+  "language": "zh",
+  "subject": "Just for Fun",
+  "grade": "9-10",
+  "topic": "humor",
+  "groups": [
+    {
+      "category": "动物的声音",
+      "difficulty": "yellow",
+      "words": ["喵喵", "汪汪", "咕咕", "哞哞"]
+    },
+    {
+      "category": "大自然的声音",
+      "difficulty": "green",
+      "words": ["哗哗", "呼呼", "滴答", "沙沙"]
+    },
+    {
+      "category": "笑声",
+      "difficulty": "blue",
+      "words": ["哈哈", "嘿嘿", "呵呵", "嘻嘻"]
+    },
+    {
+      "category": "物体的声音",
+      "difficulty": "purple",
+      "words": ["砰砰", "当当", "叮咚", "咔嚓"]
+    }
+  ]
+}

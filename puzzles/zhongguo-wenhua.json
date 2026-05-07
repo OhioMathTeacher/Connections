@@ -1,0 +1,30 @@
+{
+  "title": "中国文化",
+  "author": "Connections Builder",
+  "language": "zh",
+  "subject": "Mixed",
+  "grade": "11-12",
+  "topic": "pop-culture",
+  "groups": [
+    {
+      "category": "传统节日",
+      "difficulty": "yellow",
+      "words": ["春节", "中秋节", "端午节", "元宵节"]
+    },
+    {
+      "category": "传统食物",
+      "difficulty": "green",
+      "words": ["饺子", "粽子", "月饼", "汤圆"]
+    },
+    {
+      "category": "中国的发明",
+      "difficulty": "blue",
+      "words": ["造纸", "火药", "指南针", "印刷"]
+    },
+    {
+      "category": "十二生肖",
+      "difficulty": "purple",
+      "words": ["龙", "虎", "兔", "蛇"]
+    }
+  ]
+}

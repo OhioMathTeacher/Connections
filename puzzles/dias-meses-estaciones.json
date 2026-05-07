@@ -1,0 +1,30 @@
+{
+  "title": "Días, Meses y Estaciones",
+  "author": "Connections Builder",
+  "language": "es",
+  "subject": "Mixed",
+  "grade": "7-8",
+  "topic": "vocabulary",
+  "groups": [
+    {
+      "category": "Días de la semana",
+      "difficulty": "yellow",
+      "words": ["LUNES", "JUEVES", "SÁBADO", "DOMINGO"]
+    },
+    {
+      "category": "Meses del año",
+      "difficulty": "green",
+      "words": ["ENERO", "ABRIL", "JULIO", "OCTUBRE"]
+    },
+    {
+      "category": "Estaciones",
+      "difficulty": "blue",
+      "words": ["PRIMAVERA", "VERANO", "OTOÑO", "INVIERNO"]
+    },
+    {
+      "category": "Festividades",
+      "difficulty": "purple",
+      "words": ["NAVIDAD", "PASCUA", "AÑO NUEVO", "DÍA DE MUERTOS"]
+    }
+  ]
+}

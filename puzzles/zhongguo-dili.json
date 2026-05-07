@@ -1,0 +1,30 @@
+{
+  "title": "中国地理",
+  "author": "Connections Builder",
+  "language": "zh",
+  "subject": "Social Studies",
+  "grade": "9-10",
+  "topic": "geography",
+  "groups": [
+    {
+      "category": "大城市",
+      "difficulty": "yellow",
+      "words": ["北京", "上海", "广州", "深圳"]
+    },
+    {
+      "category": "长河",
+      "difficulty": "green",
+      "words": ["长江", "黄河", "珠江", "淮河"]
+    },
+    {
+      "category": "名山",
+      "difficulty": "blue",
+      "words": ["泰山", "华山", "黄山", "庐山"]
+    },
+    {
+      "category": "朝代",
+      "difficulty": "purple",
+      "words": ["唐朝", "宋朝", "明朝", "清朝"]
+    }
+  ]
+}

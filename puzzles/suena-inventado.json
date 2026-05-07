@@ -1,0 +1,30 @@
+{
+  "title": "Suena Inventado",
+  "author": "Connections Builder",
+  "language": "es",
+  "subject": "Just for Fun",
+  "grade": "9-10",
+  "topic": "humor",
+  "groups": [
+    {
+      "category": "Animales raros (de verdad)",
+      "difficulty": "yellow",
+      "words": ["ORNITORRINCO", "AJOLOTE", "NARVAL", "QUOKKA"]
+    },
+    {
+      "category": "Frutas exóticas (de verdad)",
+      "difficulty": "green",
+      "words": ["GUANÁBANA", "CHIRIMOYA", "MARACUYÁ", "RAMBUTÁN"]
+    },
+    {
+      "category": "Onomatopeyas",
+      "difficulty": "blue",
+      "words": ["PUM", "ZAS", "BOOM", "CRAC"]
+    },
+    {
+      "category": "Palabras que suenan inventadas",
+      "difficulty": "purple",
+      "words": ["CACHIVACHE", "CHIRIMBOLO", "ZAFARRANCHO", "BIRRIA"]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "title": "人体",
+  "author": "Connections Builder",
+  "language": "zh",
+  "subject": "Science",
+  "grade": "7-8",
+  "topic": "biology",
+  "groups": [
+    {
+      "category": "头部的部位",
+      "difficulty": "yellow",
+      "words": ["眼睛", "鼻子", "嘴巴", "耳朵"]
+    },
+    {
+      "category": "内脏",
+      "difficulty": "green",
+      "words": ["心脏", "肺", "肝", "肾"]
+    },
+    {
+      "category": "四肢",
+      "difficulty": "blue",
+      "words": ["手", "脚", "胳膊", "腿"]
+    },
+    {
+      "category": "感官",
+      "difficulty": "purple",
+      "words": ["视觉", "听觉", "味觉", "嗅觉"]
+    }
+  ]
+}

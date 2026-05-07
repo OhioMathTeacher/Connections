@@ -1,0 +1,30 @@
+{
+  "title": "El Cuerpo Humano",
+  "author": "Connections Builder",
+  "language": "es",
+  "subject": "Science",
+  "grade": "7-8",
+  "topic": "biology",
+  "groups": [
+    {
+      "category": "Partes de la cabeza",
+      "difficulty": "yellow",
+      "words": ["OJOS", "NARIZ", "BOCA", "OREJAS"]
+    },
+    {
+      "category": "Órganos internos",
+      "difficulty": "green",
+      "words": ["CORAZÓN", "PULMÓN", "HÍGADO", "RIÑÓN"]
+    },
+    {
+      "category": "Huesos",
+      "difficulty": "blue",
+      "words": ["CRÁNEO", "FÉMUR", "COSTILLA", "COLUMNA"]
+    },
+    {
+      "category": "Los cinco sentidos",
+      "difficulty": "purple",
+      "words": ["VISTA", "OÍDO", "TACTO", "OLFATO"]
+    }
+  ]
+}

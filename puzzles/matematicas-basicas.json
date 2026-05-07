@@ -1,0 +1,30 @@
+{
+  "title": "Matemáticas Básicas",
+  "author": "Connections Builder",
+  "language": "es",
+  "subject": "Math",
+  "grade": "7-8",
+  "topic": "arithmetic",
+  "groups": [
+    {
+      "category": "Operaciones",
+      "difficulty": "yellow",
+      "words": ["SUMAR", "RESTAR", "MULTIPLICAR", "DIVIDIR"]
+    },
+    {
+      "category": "Tipos de números",
+      "difficulty": "green",
+      "words": ["PAR", "IMPAR", "PRIMO", "ENTERO"]
+    },
+    {
+      "category": "Formas geométricas",
+      "difficulty": "blue",
+      "words": ["CÍRCULO", "CUADRADO", "TRIÁNGULO", "RECTÁNGULO"]
+    },
+    {
+      "category": "Unidades de medida",
+      "difficulty": "purple",
+      "words": ["METRO", "LITRO", "GRAMO", "SEGUNDO"]
+    }
+  ]
+}
