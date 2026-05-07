@@ -589,6 +589,47 @@ dialog::backdrop {
 .key-editor input { width: 100%; margin-bottom: 0.85rem; }
 
 /* ---------------- Review ---------------- */
+.link-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  margin: 0.75rem 0;
+}
+.link-row input {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, "Menlo", "Consolas", monospace;
+  font-size: 0.8rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--fg);
+  min-width: 0;
+}
+
+input.dup-bad {
+  border-color: var(--danger) !important;
+  background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+}
+
+.publish-cta {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 4%, transparent), color-mix(in srgb, var(--purple) 5%, transparent));
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+.publish-cta h3 { margin-top: 0; }
+.publish-cta button {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+.publish-cta button:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
 .pr-row {
   display: flex;
   justify-content: space-between;

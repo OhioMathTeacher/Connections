@@ -1,0 +1,29 @@
+{
+  "title": "Shakespeare",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Language Arts",
+  "grade": "11-12",
+  "groups": [
+    {
+      "category": "Shakespearean tragedies",
+      "difficulty": "yellow",
+      "words": ["HAMLET", "MACBETH", "OTHELLO", "LEAR"]
+    },
+    {
+      "category": "Comedy heroines",
+      "difficulty": "green",
+      "words": ["VIOLA", "ROSALIND", "BEATRICE", "PORTIA"]
+    },
+    {
+      "category": "Kings in history plays",
+      "difficulty": "blue",
+      "words": ["HENRY", "RICHARD", "JOHN", "EDWARD"]
+    },
+    {
+      "category": "Sonnet terminology",
+      "difficulty": "purple",
+      "words": ["SONNET", "IAMBIC", "COUPLET", "QUATRAIN"]
+    }
+  ]
+}

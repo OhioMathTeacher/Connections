@@ -1,0 +1,29 @@
+{
+  "title": "Calculus Essentials",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Math",
+  "grade": "11-12",
+  "groups": [
+    {
+      "category": "Calculus concepts",
+      "difficulty": "yellow",
+      "words": ["DERIVATIVE", "INTEGRAL", "LIMIT", "FUNCTION"]
+    },
+    {
+      "category": "Trig functions",
+      "difficulty": "green",
+      "words": ["SINE", "COSINE", "TANGENT", "SECANT"]
+    },
+    {
+      "category": "Famous mathematicians",
+      "difficulty": "blue",
+      "words": ["NEWTON", "LEIBNIZ", "EULER", "GAUSS"]
+    },
+    {
+      "category": "Greek letters used in math",
+      "difficulty": "purple",
+      "words": ["DELTA", "EPSILON", "LAMBDA", "PHI"]
+    }
+  ]
+}

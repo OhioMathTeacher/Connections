@@ -1,0 +1,29 @@
+{
+  "title": "Pop Culture Mix",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Mixed",
+  "grade": "11-12",
+  "groups": [
+    {
+      "category": "Streaming services",
+      "difficulty": "yellow",
+      "words": ["NETFLIX", "HULU", "DISNEY", "SPOTIFY"]
+    },
+    {
+      "category": "Social media platforms",
+      "difficulty": "green",
+      "words": ["INSTAGRAM", "TIKTOK", "SNAPCHAT", "TWITTER"]
+    },
+    {
+      "category": "Avengers (real names)",
+      "difficulty": "blue",
+      "words": ["STARK", "THOR", "BANNER", "ROGERS"]
+    },
+    {
+      "category": "Apple ___",
+      "difficulty": "purple",
+      "words": ["WATCH", "PIE", "JUICE", "SAUCE"]
+    }
+  ]
+}

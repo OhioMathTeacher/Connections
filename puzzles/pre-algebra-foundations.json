@@ -1,0 +1,29 @@
+{
+  "title": "Pre-Algebra Foundations",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Math",
+  "grade": "7-8",
+  "groups": [
+    {
+      "category": "Place values",
+      "difficulty": "yellow",
+      "words": ["ONES", "TENS", "HUNDREDS", "THOUSANDS"]
+    },
+    {
+      "category": "Results of operations",
+      "difficulty": "green",
+      "words": ["SUM", "DIFFERENCE", "PRODUCT", "QUOTIENT"]
+    },
+    {
+      "category": "Polygons",
+      "difficulty": "blue",
+      "words": ["TRIANGLE", "SQUARE", "PENTAGON", "HEXAGON"]
+    },
+    {
+      "category": "Things you can measure",
+      "difficulty": "purple",
+      "words": ["LENGTH", "WEIGHT", "VOLUME", "TIME"]
+    }
+  ]
+}

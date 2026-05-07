@@ -1,0 +1,29 @@
+{
+  "title": "Forces & Energy",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Science",
+  "grade": "11-12",
+  "groups": [
+    {
+      "category": "Forms of energy",
+      "difficulty": "yellow",
+      "words": ["KINETIC", "POTENTIAL", "THERMAL", "NUCLEAR"]
+    },
+    {
+      "category": "SI base units",
+      "difficulty": "green",
+      "words": ["METER", "KILOGRAM", "SECOND", "AMPERE"]
+    },
+    {
+      "category": "Subatomic particles",
+      "difficulty": "blue",
+      "words": ["PROTON", "NEUTRON", "ELECTRON", "QUARK"]
+    },
+    {
+      "category": "SI prefixes",
+      "difficulty": "purple",
+      "words": ["MEGA", "KILO", "NANO", "GIGA"]
+    }
+  ]
+}

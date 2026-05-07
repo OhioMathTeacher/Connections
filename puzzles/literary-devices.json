@@ -1,0 +1,29 @@
+{
+  "title": "Literary Devices",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Language Arts",
+  "grade": "9-10",
+  "groups": [
+    {
+      "category": "Figurative language",
+      "difficulty": "yellow",
+      "words": ["METAPHOR", "SIMILE", "HYPERBOLE", "PERSONIFICATION"]
+    },
+    {
+      "category": "Sound devices",
+      "difficulty": "green",
+      "words": ["ALLITERATION", "ASSONANCE", "ONOMATOPOEIA", "RHYME"]
+    },
+    {
+      "category": "Story elements",
+      "difficulty": "blue",
+      "words": ["PLOT", "SETTING", "CHARACTER", "THEME"]
+    },
+    {
+      "category": "Types of irony",
+      "difficulty": "purple",
+      "words": ["SITUATIONAL", "DRAMATIC", "VERBAL", "COSMIC"]
+    }
+  ]
+}
