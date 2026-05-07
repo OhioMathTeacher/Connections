@@ -1,0 +1,29 @@
+{
+  "title": "U.S. Presidents",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Social Studies",
+  "grade": "9-10",
+  "groups": [
+    {
+      "category": "21st century presidents",
+      "difficulty": "yellow",
+      "words": ["BUSH", "OBAMA", "TRUMP", "BIDEN"]
+    },
+    {
+      "category": "Antebellum presidents (pre-Civil War)",
+      "difficulty": "green",
+      "words": ["JACKSON", "POLK", "FILLMORE", "PIERCE"]
+    },
+    {
+      "category": "Mid-20th century presidents",
+      "difficulty": "blue",
+      "words": ["TRUMAN", "EISENHOWER", "KENNEDY", "JOHNSON"]
+    },
+    {
+      "category": "First four presidents",
+      "difficulty": "purple",
+      "words": ["WASHINGTON", "ADAMS", "JEFFERSON", "MADISON"]
+    }
+  ]
+}

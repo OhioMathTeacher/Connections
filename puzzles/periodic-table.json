@@ -1,0 +1,29 @@
+{
+  "title": "Periodic Table Basics",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Science",
+  "grade": "9-10",
+  "groups": [
+    {
+      "category": "Noble gases",
+      "difficulty": "yellow",
+      "words": ["HELIUM", "NEON", "ARGON", "KRYPTON"]
+    },
+    {
+      "category": "Halogens",
+      "difficulty": "green",
+      "words": ["FLUORINE", "CHLORINE", "BROMINE", "IODINE"]
+    },
+    {
+      "category": "Alkali metals",
+      "difficulty": "blue",
+      "words": ["LITHIUM", "SODIUM", "POTASSIUM", "RUBIDIUM"]
+    },
+    {
+      "category": "Elements named after places",
+      "difficulty": "purple",
+      "words": ["AMERICIUM", "FRANCIUM", "GALLIUM", "POLONIUM"]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "title": "World Capitals",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Social Studies",
+  "grade": "7-8",
+  "groups": [
+    {
+      "category": "European capitals",
+      "difficulty": "yellow",
+      "words": ["PARIS", "ROME", "MADRID", "BERLIN"]
+    },
+    {
+      "category": "Asian capitals",
+      "difficulty": "green",
+      "words": ["TOKYO", "BEIJING", "SEOUL", "BANGKOK"]
+    },
+    {
+      "category": "African capitals",
+      "difficulty": "blue",
+      "words": ["CAIRO", "NAIROBI", "ABUJA", "ACCRA"]
+    },
+    {
+      "category": "South American capitals",
+      "difficulty": "purple",
+      "words": ["LIMA", "QUITO", "BOGOTA", "SANTIAGO"]
+    }
+  ]
+}

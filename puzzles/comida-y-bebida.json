@@ -1,0 +1,29 @@
+{
+  "title": "Comida y Bebida",
+  "author": "Connections Builder",
+  "language": "es",
+  "subject": "Language Arts",
+  "grade": "7-8",
+  "groups": [
+    {
+      "category": "Frutas",
+      "difficulty": "yellow",
+      "words": ["MANZANA", "PLÁTANO", "NARANJA", "FRESA"]
+    },
+    {
+      "category": "Bebidas",
+      "difficulty": "green",
+      "words": ["AGUA", "LECHE", "JUGO", "CAFÉ"]
+    },
+    {
+      "category": "Comidas",
+      "difficulty": "blue",
+      "words": ["PIZZA", "TACO", "HAMBURGUESA", "ENSALADA"]
+    },
+    {
+      "category": "Postres",
+      "difficulty": "purple",
+      "words": ["HELADO", "FLAN", "GALLETA", "PASTEL"]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "title": "Ancient Civilizations",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Social Studies",
+  "grade": "11-12",
+  "groups": [
+    {
+      "category": "Ancient civilizations",
+      "difficulty": "yellow",
+      "words": ["GREEK", "ROMAN", "EGYPTIAN", "MAYAN"]
+    },
+    {
+      "category": "Greek gods",
+      "difficulty": "green",
+      "words": ["ZEUS", "APOLLO", "ATHENA", "POSEIDON"]
+    },
+    {
+      "category": "Ancient wonders & landmarks",
+      "difficulty": "blue",
+      "words": ["PYRAMIDS", "COLOSSEUM", "PETRA", "STONEHENGE"]
+    },
+    {
+      "category": "Ancient writing systems",
+      "difficulty": "purple",
+      "words": ["CUNEIFORM", "HIEROGLYPHS", "SANSKRIT", "RUNES"]
+    }
+  ]
+}
