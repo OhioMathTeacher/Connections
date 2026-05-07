@@ -3,12 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Connections Builder</title>
+<title>Clique · game maker</title>
+<meta name="description" content="Clique — build, share, and play Connections-style word puzzles for the classroom.">
+<meta name="theme-color" content="#AFA9EC">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
-  <h1><a href="#/">Connections</a></h1>
+  <a href="#/" class="brand" aria-label="Clique home">
+    <span class="brand-icon" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 32 32">
+        <rect x="0"  y="0"  width="14" height="14" rx="3" fill="#AFA9EC"/>
+        <rect x="18" y="0"  width="14" height="14" rx="3" fill="#F0997B"/>
+        <rect x="0"  y="18" width="14" height="14" rx="3" fill="#5DCAA5"/>
+        <rect x="18" y="18" width="14" height="14" rx="3" fill="#FAC775"/>
+      </svg>
+    </span>
+    <span class="brand-name">clique</span>
+    <span class="brand-tag">game maker</span>
+  </a>
   <nav>
     <a href="#/">Play</a>
     <a href="#/build">Build</a>
@@ -157,9 +171,9 @@
 
 <template id="view-about">
   <section class="about">
-    <h2>About</h2>
-    <p>This is a fan-made Connections-style puzzle builder. Players try to find four groups of four words that share a hidden theme — yellow is easiest, purple is hardest. You get four mistakes before the game ends.</p>
-    <p>Anyone can build a puzzle and submit it to the repo. Submissions open a pre-filled GitHub commit page, which creates a pull request. A maintainer reviews it on the <a href="#/review">Review page</a> (test-play it first!) and merges. Once merged, it appears on the Play list automatically.</p>
+    <h2>About Clique</h2>
+    <p><strong>Clique</strong> is a classroom-friendly Connections-style puzzle game maker. Players hunt for four groups of four words that share a hidden theme — easiest to hardest. You get four mistakes before the game ends.</p>
+    <p>Anyone can build a puzzle. Students click <em>Send to teacher</em> to share their puzzle as a link — no GitHub account needed. Teachers review the puzzle by playing it, then publish it to the library with one click. Generated puzzles can come from your own AI key (Groq, OpenAI, Gemini, or Claude) — keys stay in the browser and are never uploaded.</p>
     <p>Source: <a id="repo-link" href="#">GitHub</a></p>
   </section>
 </template>
