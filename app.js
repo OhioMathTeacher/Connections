@@ -130,6 +130,8 @@ async function renderHome() {
   fillSelect($("#filter-lang"), [{ value: "", label: "All languages" }, ...LANGUAGES.map(l => ({ value: l.code, label: l.label }))]);
   fillSelect($("#filter-subject"), [{ value: "", label: "All subjects" }, ...SUBJECTS.map(s => ({ value: s, label: s }))]);
   fillSelect($("#filter-grade"), [{ value: "", label: "All grades" }, ...GRADES.map(g => ({ value: g, label: `Grades ${g}` }))]);
+  // Default to Science so the list doesn't overflow the viewport on first load
+  $("#filter-subject").value = "Science";
 
   const list = $("#puzzle-list");
   list.innerHTML = `<li class="loading">Loading puzzles…</li>`;
@@ -163,8 +165,11 @@ async function renderHome() {
         it.grade    ? `<span class="badge">Gr ${escapeHtml(it.grade)}</span>` : "",
       ].join("");
       li.innerHTML = `<a href="#/play/${encodeURIComponent(it.slug)}">
-        <div class="row-title">${escapeHtml(it.title)}</div>
-        <div class="meta">${escapeHtml(it.author || "anonymous")} ${badges}</div>
+        <img class="puzzle-icon" src="assets/icons/${encodeURIComponent(it.slug)}.svg" alt="" loading="lazy" onerror="this.src='assets/icons/_default.svg'">
+        <div class="puzzle-info">
+          <div class="row-title">${escapeHtml(it.title)}</div>
+          <div class="meta">${escapeHtml(it.author || "anonymous")} ${badges}</div>
+        </div>
       </a>`;
       list.appendChild(li);
     }
