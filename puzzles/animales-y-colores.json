@@ -1,0 +1,29 @@
+{
+  "title": "Animales y Colores",
+  "author": "Connections Builder",
+  "language": "es",
+  "subject": "Language Arts",
+  "grade": "7-8",
+  "groups": [
+    {
+      "category": "Colores",
+      "difficulty": "yellow",
+      "words": ["ROJO", "AZUL", "VERDE", "AMARILLO"]
+    },
+    {
+      "category": "Animales de granja",
+      "difficulty": "green",
+      "words": ["VACA", "CERDO", "POLLO", "OVEJA"]
+    },
+    {
+      "category": "Días de la semana",
+      "difficulty": "blue",
+      "words": ["LUNES", "MARTES", "JUEVES", "VIERNES"]
+    },
+    {
+      "category": "Frutas tropicales",
+      "difficulty": "purple",
+      "words": ["MANGO", "PIÑA", "PAPAYA", "GUAYABA"]
+    }
+  ]
+}

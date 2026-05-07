@@ -1,6 +1,9 @@
 {
   "title": "Movies Night",
   "author": "Connections Builder",
+  "language": "en",
+  "subject": "Language Arts",
+  "grade": "9-10",
   "groups": [
     {
       "category": "Tom Hanks movies",

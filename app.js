@@ -6,6 +6,18 @@ const REPO_BRANCH = "main";
 const GITHUB_API = "https://api.github.com";
 const DIFFICULTIES = ["yellow", "green", "blue", "purple"];
 
+const LANGUAGES = [
+  { code: "en", label: "English" },
+  { code: "es", label: "Spanish" },
+  { code: "zh", label: "Chinese" },
+];
+const SUBJECTS = ["Science", "Math", "Social Studies", "Language Arts", "Mixed"];
+const GRADES = ["7-8", "9-10", "11-12"];
+
+function languageLabel(code) {
+  return (LANGUAGES.find(l => l.code === code) || {}).label || code || "—";
+}
+
 const app = document.getElementById("app");
 
 function $(sel, root = document) { return root.querySelector(sel); }
@@ -68,21 +80,63 @@ window.addEventListener("hashchange", route);
 
 async function renderHome() {
   renderTemplate("view-home");
+  // Populate filter dropdowns
+  fillSelect($("#filter-lang"), [{ value: "", label: "All languages" }, ...LANGUAGES.map(l => ({ value: l.code, label: l.label }))]);
+  fillSelect($("#filter-subject"), [{ value: "", label: "All subjects" }, ...SUBJECTS.map(s => ({ value: s, label: s }))]);
+  fillSelect($("#filter-grade"), [{ value: "", label: "All grades" }, ...GRADES.map(g => ({ value: g, label: `Grades ${g}` }))]);
+
   const list = $("#puzzle-list");
+  list.innerHTML = `<li class="loading">Loading puzzles…</li>`;
+  let items = [];
   try {
-    const items = await discoverPuzzles();
-    if (!items.length) {
-      list.innerHTML = `<li class="loading">No puzzles yet — be the first to <a href="#/build">build one</a>.</li>`;
+    items = await discoverPuzzles();
+  } catch (e) {
+    list.innerHTML = `<li class="loading">Couldn't load puzzles. <a href="#/build">Build one →</a></li>`;
+    return;
+  }
+
+  const apply = () => {
+    const lang = $("#filter-lang").value;
+    const subj = $("#filter-subject").value;
+    const grade = $("#filter-grade").value;
+    const filtered = items.filter(it =>
+      (!lang || it.language === lang) &&
+      (!subj || it.subject === subj) &&
+      (!grade || it.grade === grade)
+    );
+    if (!filtered.length) {
+      list.innerHTML = `<li class="loading">No puzzles match those filters. Try widening the search, or <a href="#/build">build one</a>.</li>`;
       return;
     }
     list.innerHTML = "";
-    for (const it of items) {
+    for (const it of filtered) {
       const li = document.createElement("li");
-      li.innerHTML = `<a href="#/play/${encodeURIComponent(it.slug)}">${escapeHtml(it.title)}<span class="meta">${escapeHtml(it.author || "anonymous")}</span></a>`;
+      const badges = [
+        it.language ? `<span class="badge">${escapeHtml(languageLabel(it.language))}</span>` : "",
+        it.subject  ? `<span class="badge">${escapeHtml(it.subject)}</span>` : "",
+        it.grade    ? `<span class="badge">Gr ${escapeHtml(it.grade)}</span>` : "",
+      ].join("");
+      li.innerHTML = `<a href="#/play/${encodeURIComponent(it.slug)}">
+        <div class="row-title">${escapeHtml(it.title)}</div>
+        <div class="meta">${escapeHtml(it.author || "anonymous")} ${badges}</div>
+      </a>`;
       list.appendChild(li);
     }
-  } catch (e) {
-    list.innerHTML = `<li class="loading">Couldn't load puzzles. <a href="#/build">Build one →</a></li>`;
+  };
+
+  $("#filter-lang").addEventListener("change", apply);
+  $("#filter-subject").addEventListener("change", apply);
+  $("#filter-grade").addEventListener("change", apply);
+  apply();
+}
+
+function fillSelect(sel, options) {
+  sel.innerHTML = "";
+  for (const o of options) {
+    const opt = document.createElement("option");
+    opt.value = o.value;
+    opt.textContent = o.label;
+    sel.appendChild(opt);
   }
 }
 
@@ -124,7 +178,14 @@ async function discoverPuzzles() {
       const r = await fetch(`puzzles/${name}`, { cache: "no-cache" });
       if (!r.ok) return null;
       const p = await r.json();
-      return { slug, title: p.title || slug, author: p.author || "" };
+      return {
+        slug,
+        title: p.title || slug,
+        author: p.author || "",
+        language: p.language || "",
+        subject: p.subject || "",
+        grade: p.grade || "",
+      };
     } catch (e) {
       return { slug, title: slug, author: "" };
     }
@@ -302,6 +363,10 @@ function submitGuess(state) {
 
 function renderBuild() {
   renderTemplate("view-build");
+  // Populate metadata selects
+  fillSelect($("select[name=language]"), [{ value: "", label: "Choose…" }, ...LANGUAGES.map(l => ({ value: l.code, label: l.label }))]);
+  fillSelect($("select[name=subject]"),  [{ value: "", label: "Choose…" }, ...SUBJECTS.map(s => ({ value: s, label: s }))]);
+  fillSelect($("select[name=grade]"),    [{ value: "", label: "Choose…" }, ...GRADES.map(g => ({ value: g, label: `Grades ${g}` }))]);
   $("#btn-preview").onclick = () => {
     const p = readForm();
     if (!p) return;
@@ -355,6 +420,9 @@ function readForm() {
   return {
     title: String(fd.get("title")).trim(),
     author: String(fd.get("author") || "").trim(),
+    language: String(fd.get("language") || "").trim(),
+    subject: String(fd.get("subject") || "").trim(),
+    grade: String(fd.get("grade") || "").trim(),
     groups,
   };
 }

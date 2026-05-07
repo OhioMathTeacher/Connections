@@ -22,6 +22,11 @@
 <template id="view-home">
   <section class="home">
     <h2>Pick a puzzle</h2>
+    <div class="filters">
+      <label>Language <select id="filter-lang"></select></label>
+      <label>Subject <select id="filter-subject"></select></label>
+      <label>Grade <select id="filter-grade"></select></label>
+    </div>
     <ul id="puzzle-list" class="puzzle-list">
       <li class="loading">Loading puzzles…</li>
     </ul>
@@ -60,6 +65,12 @@
     <form id="build-form">
       <label>Title <input name="title" required maxlength="80" placeholder="My Awesome Puzzle"></label>
       <label>Author <input name="author" maxlength="40" placeholder="Your name (optional)"></label>
+
+      <div class="meta-row">
+        <label>Language <select name="language" required></select></label>
+        <label>Subject <select name="subject" required></select></label>
+        <label>Grade level <select name="grade" required></select></label>
+      </div>
 
       <div class="groups">
         <div class="group g-yellow">

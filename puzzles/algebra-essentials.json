@@ -1,0 +1,29 @@
+{
+  "title": "Algebra Essentials",
+  "author": "Connections Builder",
+  "language": "en",
+  "subject": "Math",
+  "grade": "9-10",
+  "groups": [
+    {
+      "category": "Operations",
+      "difficulty": "yellow",
+      "words": ["ADD", "SUBTRACT", "MULTIPLY", "DIVIDE"]
+    },
+    {
+      "category": "Parts of an equation",
+      "difficulty": "green",
+      "words": ["VARIABLE", "COEFFICIENT", "CONSTANT", "EXPONENT"]
+    },
+    {
+      "category": "Types of numbers",
+      "difficulty": "blue",
+      "words": ["RATIONAL", "INTEGER", "PRIME", "REAL"]
+    },
+    {
+      "category": "Greek letters used in math",
+      "difficulty": "purple",
+      "words": ["PI", "SIGMA", "DELTA", "THETA"]
+    }
+  ]
+}
