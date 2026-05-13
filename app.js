@@ -630,6 +630,18 @@ function renderAbout() {
 
 const PROVIDERS = [
   {
+    id: "athena-v6",
+    label: "Athena V6 (Local)",
+    local: true,
+    keyUrl: "https://github.com/OhioMathTeacher/AthenaV6",
+    generate: (_key, prompt) => callOpenAICompatible({
+      url: "http://127.0.0.1:8765/v1/chat/completions",
+      key: "local",
+      model: "athena-v6",
+      prompt,
+    }),
+  },
+  {
     id: "groq",
     label: "Groq",
     keyUrl: "https://console.groq.com/keys",
@@ -662,12 +674,16 @@ const PROVIDERS = [
 ];
 
 const KEY_PREFIX = "connections.apiKey.";
-function getKey(id) { return localStorage.getItem(KEY_PREFIX + id) || ""; }
+function getKey(id) {
+  const p = PROVIDERS.find(x => x.id === id);
+  if (p && p.local) return "local";
+  return localStorage.getItem(KEY_PREFIX + id) || "";
+}
 function setKey(id, val) {
   if (val) localStorage.setItem(KEY_PREFIX + id, val);
   else localStorage.removeItem(KEY_PREFIX + id);
 }
-function providersWithKeys() { return PROVIDERS.filter(p => getKey(p.id)); }
+function providersWithKeys() { return PROVIDERS.filter(p => p.local || getKey(p.id)); }
 
 // ---- Keys dialog ----
 
@@ -681,12 +697,18 @@ function renderKeysGrid() {
   const grid = $("#keys-grid");
   grid.innerHTML = "";
   for (const p of PROVIDERS) {
-    const has = !!getKey(p.id);
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "key-card";
-    btn.innerHTML = `<span>${escapeHtml(p.label)}</span><span class="status ${has ? "set" : ""}">${has ? "✓ saved" : "— add key"}</span>`;
-    btn.onclick = () => openKeyEditor(p.id);
+    if (p.local) {
+      btn.innerHTML = `<span>${escapeHtml(p.label)}</span><span class="status set">✓ available — no key needed</span>`;
+      btn.onclick = () => {};
+      btn.style.cursor = "default";
+    } else {
+      const has = !!localStorage.getItem(KEY_PREFIX + p.id);
+      btn.innerHTML = `<span>${escapeHtml(p.label)}</span><span class="status ${has ? "set" : ""}">${has ? "✓ key saved" : "— add API key"}</span>`;
+      btn.onclick = () => openKeyEditor(p.id);
+    }
     grid.appendChild(btn);
   }
 }
@@ -721,7 +743,7 @@ function bindKeysUI() {
 function openGenerateDialog() {
   const have = providersWithKeys();
   if (!have.length) {
-    alert("No API keys saved yet. Click 🔑 Keys in the top nav and add one first.");
+    alert("No AI models available. Click 🤖 AI Models in the top nav to add one (or make sure the local Athena V6 shim is running).");
     return;
   }
   const sel = $("#gen-provider");
