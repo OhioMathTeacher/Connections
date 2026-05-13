@@ -101,7 +101,9 @@ a { color: var(--fg); }
 header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  /* No z-index here — the sticky position keeps the header visible on scroll,
+     and skipping z-index means the header doesn't create a stacking context
+     that traps tile-tooltips (.tile.with-hint::after) below it. */
   display: flex;
   justify-content: space-between;
   align-items: center;

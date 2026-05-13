@@ -416,7 +416,6 @@ function drawBoard(state) {
       if (hint) {
         btn.classList.add("with-hint");
         btn.dataset.hint = hint;
-        btn.title = hint;
       }
     }
     btn.onclick = () => {
