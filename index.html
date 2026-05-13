@@ -109,11 +109,19 @@
       <div class="buttons">
         <button id="btn-shuffle" type="button">Shuffle</button>
         <button id="btn-deselect" type="button">Deselect</button>
+        <button id="btn-ask-athena" type="button">🪢 Ask Athena</button>
         <button id="btn-submit" type="button" class="primary" disabled>Submit</button>
       </div>
     </div>
 
     <div id="message" class="message" aria-live="polite"></div>
+    <div id="athena-panel" class="athena-panel" hidden>
+      <div class="athena-panel-head">
+        <span class="athena-panel-label">🪢 Athena</span>
+        <button type="button" id="btn-athena-close" class="athena-close" aria-label="Close">×</button>
+      </div>
+      <div id="athena-panel-body" class="athena-panel-body"></div>
+    </div>
   </section>
 </template>
 

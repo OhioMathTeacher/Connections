@@ -534,6 +534,47 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .message.lose { color: var(--danger); }
 .message.hint { color: var(--hint); }
 
+/* ---------------- Athena Socratic panel (gameplay) ---------------- */
+.athena-panel {
+  margin: 1.25rem auto 0;
+  max-width: 560px;
+  border: 1px solid var(--border-soft, rgba(0,0,0,0.12));
+  border-left: 3px solid var(--hint);
+  border-radius: 10px;
+  background: var(--panel, rgba(255,255,255,0.02));
+  padding: 0.85rem 1rem 0.95rem;
+  box-shadow: var(--shadow-md, 0 2px 12px rgba(0,0,0,0.18));
+}
+.athena-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+.athena-panel-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hint);
+}
+.athena-close {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  padding: 0 0.25rem;
+}
+.athena-close:hover { opacity: 1; }
+.athena-panel-body {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
 /* ---------------- Build ---------------- */
 .build form { display: flex; flex-direction: column; gap: 1.1rem; }
 .build label {

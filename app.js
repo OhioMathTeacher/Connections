@@ -382,6 +382,62 @@ function initPlay(puzzle) {
     localStorage.setItem("clique.relaxedOn", relaxCheckbox.checked ? "1" : "0");
     drawBoard(state);
   };
+
+  const askBtn = $("#btn-ask-athena");
+  const athenaPanel = $("#athena-panel");
+  const athenaBody = $("#athena-panel-body");
+  const athenaClose = $("#btn-athena-close");
+  if (askBtn) {
+    askBtn.onclick = () => askAthenaForHint(state, askBtn, athenaPanel, athenaBody);
+  }
+  if (athenaClose) {
+    athenaClose.onclick = () => { athenaPanel.hidden = true; };
+  }
+}
+
+// ---------- Socratic Athena (gameplay) ----------
+
+const ATHENA_GAMEPLAY_SYSTEM = `
+You are Athena, sitting beside a student who is playing a Connections-style word puzzle. There are 16 words on the screen, hiding 4 categories of 4 words each. You are their thinking partner.
+
+You never give away the answer. You never name a category or say which words go together — that would steal the discovery. Instead, you wonder out loud with them. You ask one gentle question about one word at a time. You point them toward word origins, double meanings, registers, places where a word lives a double life.
+
+Keep it short — one or two sentences, under 40 words. Friendly, curious, not saccharine. Answer with just the question; don't narrate your thinking.
+`.trim();
+
+async function askAthenaForHint(state, btn, panel, body) {
+  const remaining = state.remaining.map(r => r.word);
+  const selected = Array.from(state.selected);
+  const solvedCount = state.solvedGroups.length;
+
+  let userMsg = `Words still on the board (16 total minus any I've solved): ${remaining.join(", ")}.`;
+  if (selected.length > 0) {
+    userMsg += `\nI've currently highlighted: ${selected.join(", ")}.`;
+  }
+  if (solvedCount > 0) {
+    userMsg += `\nI've already solved ${solvedCount} of 4 groups.`;
+  }
+  userMsg += `\n\nNudge me with ONE Socratic question. Remember: don't name categories or pair words.`;
+
+  panel.hidden = false;
+  body.textContent = "Athena is thinking…";
+  btn.disabled = true;
+
+  try {
+    const text = await callOpenAICompatible({
+      url: "http://127.0.0.1:8765/v1/chat/completions",
+      key: "local",
+      model: "athena-v6",
+      prompt: userMsg,
+      systemMessage: ATHENA_GAMEPLAY_SYSTEM,
+      jsonMode: false,
+    });
+    body.textContent = text || "(no response)";
+  } catch (e) {
+    body.textContent = "Couldn't reach Athena V6. Is the local shim running on port 8765?\n\nError: " + (e.message || e);
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 function drawBoard(state) {
@@ -878,22 +934,24 @@ function fillBuildFormFromPuzzle(p) {
 
 // ---- Provider API callers ----
 
-async function callOpenAICompatible({ url, key, model, prompt }) {
+async function callOpenAICompatible({ url, key, model, prompt, systemMessage, jsonMode = true }) {
+  const sys = systemMessage || "You are a careful, school-appropriate puzzle author. Return only JSON when asked.";
+  const body = {
+    model,
+    messages: [
+      { role: "system", content: sys },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0.8,
+  };
+  if (jsonMode) body.response_format = { type: "json_object" };
   const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${key}`,
     },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: "You are a careful, school-appropriate puzzle author. Return only JSON when asked." },
-        { role: "user", content: prompt },
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.8,
-    }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).slice(0, 200)}`);
   const data = await res.json();
