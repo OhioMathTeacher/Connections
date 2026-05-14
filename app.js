@@ -721,8 +721,39 @@ const AI_CLOUD_PROVIDERS = [
   },
 ];
 
-function getStoredProvider()        { return localStorage.getItem(AI_STORAGE.provider) || "none"; }
-function setStoredProvider(id)      { localStorage.setItem(AI_STORAGE.provider, id); refreshHeaderIndicator(); }
+// _runtimeProviderOverride lets the boot-time health check disable a saved
+// local provider for THIS SESSION without clearing the user's localStorage
+// preference. If a local server isn't reachable at startup, present an
+// honest "AI: Off" state. When the user reopens AI Setup later, the
+// discovery probe finds the server (if it's now up) and they can re-select
+// with one click. Cleared whenever setStoredProvider() is called (explicit
+// user choice).
+let _runtimeProviderOverride = null;
+function getStoredProvider() {
+  if (_runtimeProviderOverride !== null) return _runtimeProviderOverride;
+  return localStorage.getItem(AI_STORAGE.provider) || "none";
+}
+function setStoredProvider(id) {
+  _runtimeProviderOverride = null;
+  localStorage.setItem(AI_STORAGE.provider, id);
+  refreshHeaderIndicator();
+}
+
+// Probe the saved local provider once at boot. If unreachable, override to
+// 'none' for the session (without touching localStorage).
+async function verifySavedLocalProvider() {
+  const stored = localStorage.getItem(AI_STORAGE.provider) || "none";
+  const parsed = parseLocalProvider(stored);
+  if (!parsed) return;
+  const url = parsed.endpoint.replace(/\/+$/, "") + "/v1/models";
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(1500) });
+    if (!res.ok) throw new Error(`${res.status}`);
+  } catch {
+    _runtimeProviderOverride = "none";
+    refreshHeaderIndicator();
+  }
+}
 function getStoredKey(id)           { return localStorage.getItem(AI_STORAGE.key(id)) || ""; }
 function setStoredKey(id, key) {
   if (key) localStorage.setItem(AI_STORAGE.key(id), key);
@@ -1276,3 +1307,4 @@ async function callAnthropic({ key, model, prompt, systemMessage }) {
 // boot
 bindAiUI();
 route();
+verifySavedLocalProvider();  // probe saved local server; falls back to 'none' if unreachable
