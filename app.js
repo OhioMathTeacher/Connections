@@ -419,22 +419,26 @@ async function askAthenaForHint(state, btn, panel, body) {
   }
   userMsg += `\n\nNudge me with ONE Socratic question. Remember: don't name categories or pair words.`;
 
+  const provider = resolveActiveProvider();
+  if (!provider) {
+    panel.hidden = false;
+    body.textContent = "Pick a model first — click 🤖 AI Setup in the top nav.";
+    return;
+  }
+
   panel.hidden = false;
-  body.textContent = "Athena is thinking…";
+  body.textContent = `${provider.label} is thinking…`;
   btn.disabled = true;
 
   try {
-    const text = await callOpenAICompatible({
-      url: "http://127.0.0.1:8765/v1/chat/completions",
-      key: "local",
-      model: "athena-v6",
+    const text = await provider.generate({
       prompt: userMsg,
       systemMessage: ATHENA_GAMEPLAY_SYSTEM,
       jsonMode: false,
     });
     body.textContent = text || "(no response)";
   } catch (e) {
-    body.textContent = "Couldn't reach Athena V6. Is the local shim running on port 8765?\n\nError: " + (e.message || e);
+    body.textContent = `Couldn't reach ${provider.label}.\n\nError: ${e.message || e}`;
   } finally {
     btn.disabled = false;
   }
@@ -681,166 +685,436 @@ function renderAbout() {
   if (link) link.href = `https://github.com/${REPO_OWNER}/${REPO_NAME}`;
 }
 
-// ---------- AI puzzle generation (bring-your-own-key) ----------
+// ---------- AI Setup (orbit-explorer-style modal, Clique palette) ----------
+//
+// Three cloud providers + dynamically-discovered local OpenAI-compatible
+// endpoints (configured by the user via the modal — no URLs hardcoded).
+// One globally-selected provider is used everywhere (Build/Generate, Ask Athena).
 
-const PROVIDERS = [
+const AI_STORAGE = {
+  provider:   "clique.ai.provider",
+  key:        (id) => `clique.ai.key.${id}`,
+  endpoints:  "clique.ai.localEndpoints",
+};
+
+const AI_CLOUD_PROVIDERS = [
   {
-    id: "athena-v6",
-    label: "Athena V6 (Local)",
-    local: true,
-    keyUrl: "https://github.com/OhioMathTeacher/AthenaV6",
-    generate: (_key, prompt) => callOpenAICompatible({
-      url: "http://127.0.0.1:8765/v1/chat/completions",
-      key: "local",
-      model: "athena-v6",
-      prompt,
-    }),
+    id: "anthropic", label: "Anthropic Claude",
+    desc: "Your own key. Claude Sonnet — powerful and precise.",
+    badge: "Own Key", badgeClass: "ai-badge-paid",
+    placeholder: "sk-ant-…",
+    keyHint: 'Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>. Stored only in your browser.',
   },
   {
-    id: "groq",
-    label: "Groq",
-    keyUrl: "https://console.groq.com/keys",
-    generate: (key, prompt) => callOpenAICompatible({
-      url: "https://api.groq.com/openai/v1/chat/completions",
-      key, model: "llama-3.3-70b-versatile", prompt,
-    }),
+    id: "gemini", label: "Gemini 2.0 Flash",
+    desc: "Free tier via Google. Use a personal Gmail account.",
+    badge: "Free", badgeClass: "ai-badge-free",
+    placeholder: "AIza…",
+    keyHint: 'Visit <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com</a> for a free key — <strong>use a personal Gmail, not a school account</strong>. Stored in your browser only.',
   },
   {
-    id: "openai",
-    label: "OpenAI",
-    keyUrl: "https://platform.openai.com/api-keys",
-    generate: (key, prompt) => callOpenAICompatible({
-      url: "https://api.openai.com/v1/chat/completions",
-      key, model: "gpt-4o-mini", prompt,
-    }),
-  },
-  {
-    id: "gemini",
-    label: "Gemini",
-    keyUrl: "https://aistudio.google.com/apikey",
-    generate: (key, prompt) => callGemini({ key, model: "gemini-2.0-flash", prompt }),
-  },
-  {
-    id: "anthropic",
-    label: "Claude",
-    keyUrl: "https://console.anthropic.com/settings/keys",
-    generate: (key, prompt) => callAnthropic({ key, model: "claude-sonnet-4-6", prompt }),
+    id: "groq", label: "Groq (Llama 3.3)",
+    desc: "Free tier. Any email — no Google account needed.",
+    badge: "Free", badgeClass: "ai-badge-free",
+    placeholder: "gsk_…",
+    keyHint: 'Visit <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> for a free key — any email works. Stored in your browser only.',
   },
 ];
 
-const KEY_PREFIX = "connections.apiKey.";
-function getKey(id) {
-  const p = PROVIDERS.find(x => x.id === id);
-  if (p && p.local) return "local";
-  return localStorage.getItem(KEY_PREFIX + id) || "";
+function getStoredProvider()        { return localStorage.getItem(AI_STORAGE.provider) || "none"; }
+function setStoredProvider(id)      { localStorage.setItem(AI_STORAGE.provider, id); refreshHeaderIndicator(); }
+function getStoredKey(id)           { return localStorage.getItem(AI_STORAGE.key(id)) || ""; }
+function setStoredKey(id, key) {
+  if (key) localStorage.setItem(AI_STORAGE.key(id), key);
+  else     localStorage.removeItem(AI_STORAGE.key(id));
 }
-function setKey(id, val) {
-  if (val) localStorage.setItem(KEY_PREFIX + id, val);
-  else localStorage.removeItem(KEY_PREFIX + id);
+function getStoredLocalEndpoints() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(AI_STORAGE.endpoints) || "[]");
+    // Filter out any garbage (e.g., someone pasted an API key here once)
+    return arr.filter(u => /^https?:\/\//i.test(String(u)));
+  } catch { return []; }
 }
-function providersWithKeys() { return PROVIDERS.filter(p => p.local || getKey(p.id)); }
+function setStoredLocalEndpoints(arr) {
+  localStorage.setItem(AI_STORAGE.endpoints, JSON.stringify(arr));
+}
 
-// ---- Keys dialog ----
-
-function openKeysDialog() {
-  const dlg = $("#keys-dialog");
-  renderKeysGrid();
-  $("#key-editor").hidden = true;
-  dlg.showModal();
+// "local:<endpoint>:<modelId>" — endpoint may contain colons, so modelId is after the LAST colon.
+function parseLocalProvider(id) {
+  if (!id || !id.startsWith("local:")) return null;
+  const rest = id.slice("local:".length);
+  const lastColon = rest.lastIndexOf(":");
+  if (lastColon === -1) return null;
+  return { endpoint: rest.slice(0, lastColon), modelId: rest.slice(lastColon + 1) };
 }
-function renderKeysGrid() {
-  const grid = $("#keys-grid");
-  grid.innerHTML = "";
-  for (const p of PROVIDERS) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "key-card";
-    if (p.local) {
-      btn.innerHTML = `<span>${escapeHtml(p.label)}</span><span class="status set">✓ available — no key needed</span>`;
-      btn.onclick = () => {};
-      btn.style.cursor = "default";
-    } else {
-      const has = !!localStorage.getItem(KEY_PREFIX + p.id);
-      btn.innerHTML = `<span>${escapeHtml(p.label)}</span><span class="status ${has ? "set" : ""}">${has ? "✓ key saved" : "— add API key"}</span>`;
-      btn.onclick = () => openKeyEditor(p.id);
-    }
-    grid.appendChild(btn);
+
+// In-memory cache of models discovered per endpoint: { [url]: [{id,label}, ...] }
+const localModelsByEndpoint = {};
+
+// Well-known ports for popular local LLM servers. Probed on modal open so users
+// running these don't have to type a URL. The user still chooses — the result is
+// surfaced as a one-click suggestion tile, not auto-saved.
+const WELL_KNOWN_LOCAL_PORTS = [
+  { url: "http://127.0.0.1:8765",  hint: "Athena / OpenAI-compatible shim" },
+  { url: "http://127.0.0.1:11434", hint: "Ollama" },
+  { url: "http://127.0.0.1:1234",  hint: "LM Studio" },
+];
+
+// Suggestions discovered this session: [{url, hint, models: [{id,label}]}]
+let _suggestedLocalServers = [];
+
+async function discoverModelsAt(url) {
+  const trimmed = url.replace(/\/+$/, "");
+  const probe = `${trimmed}/v1/models`;
+  try {
+    const res = await fetch(probe, { method: "GET" });
+    if (!res.ok) throw new Error(`${res.status}`);
+    const data = await res.json();
+    const models = (data.data || []).map(m => ({
+      id: String(m.id),
+      label: String(m.id),
+    }));
+    localModelsByEndpoint[url] = models;
+    return models;
+  } catch (e) {
+    localModelsByEndpoint[url] = [];
+    return [];
   }
 }
-function openKeyEditor(id) {
-  const p = PROVIDERS.find(x => x.id === id);
-  $("#key-editor-title").textContent = `${p.label} API key`;
-  $("#key-editor-link").href = p.keyUrl;
-  $("#key-editor-input").value = getKey(id);
-  $("#key-editor").hidden = false;
-  $("#key-editor-save").onclick = () => {
-    setKey(id, $("#key-editor-input").value.trim());
-    renderKeysGrid();
-    $("#key-editor").hidden = true;
-  };
-  $("#key-editor-remove").onclick = () => {
-    setKey(id, "");
-    renderKeysGrid();
-    $("#key-editor").hidden = true;
-  };
-  $("#key-editor-cancel").onclick = () => { $("#key-editor").hidden = true; };
+
+async function refreshAllLocalModels() {
+  const endpoints = getStoredLocalEndpoints();
+  await Promise.all(endpoints.map(discoverModelsAt));
 }
 
-function bindKeysUI() {
+// Probe each well-known port (skipping those the user already saved) and
+// populate _suggestedLocalServers with whatever responds. Re-renders on completion.
+async function probeWellKnownLocalServers() {
+  const saved = new Set(getStoredLocalEndpoints());
+  const candidates = WELL_KNOWN_LOCAL_PORTS.filter(c => !saved.has(c.url));
+  const settled = await Promise.all(candidates.map(async (c) => {
+    try {
+      const res = await fetch(`${c.url}/v1/models`, { method: "GET", signal: AbortSignal.timeout(1500) });
+      if (!res.ok) return null;
+      const data = await res.json();
+      const models = (data.data || []).map(m => ({ id: String(m.id), label: String(m.id) }));
+      if (!models.length) return null;
+      return { url: c.url, hint: c.hint, models };
+    } catch { return null; }
+  }));
+  _suggestedLocalServers = settled.filter(Boolean);
+  renderProviderCards();
+}
+
+// Resolve the currently-selected provider to something with .generate({prompt,systemMessage,jsonMode}) and .label
+function resolveActiveProvider() {
+  const id = getStoredProvider();
+  if (!id || id === "none") return null;
+  const local = parseLocalProvider(id);
+  if (local) {
+    const trimmed = local.endpoint.replace(/\/+$/, "");
+    return {
+      label: local.modelId,
+      generate: ({ prompt, systemMessage, jsonMode }) => callOpenAICompatible({
+        url: `${trimmed}/v1/chat/completions`,
+        key: "local",
+        model: local.modelId,
+        prompt, systemMessage, jsonMode,
+      }),
+    };
+  }
+  const cloud = AI_CLOUD_PROVIDERS.find(p => p.id === id);
+  if (!cloud) return null;
+  const key = getStoredKey(cloud.id);
+  if (!key) return null;
+  return {
+    label: cloud.label,
+    generate: ({ prompt, systemMessage, jsonMode }) => {
+      if (cloud.id === "anthropic") return callAnthropic({ key, model: "claude-sonnet-4-6", prompt, systemMessage });
+      if (cloud.id === "gemini")    return callGemini({ key, model: "gemini-2.0-flash", prompt, systemMessage, jsonMode });
+      if (cloud.id === "groq")      return callOpenAICompatible({
+        url: "https://api.groq.com/openai/v1/chat/completions",
+        key, model: "llama-3.3-70b-versatile", prompt, systemMessage, jsonMode,
+      });
+      throw new Error(`Unknown cloud provider: ${cloud.id}`);
+    },
+  };
+}
+
+function activeProviderLabel() {
+  const p = resolveActiveProvider();
+  return p ? p.label : null;
+}
+
+function refreshHeaderIndicator() {
+  const btn = $("#open-keys");
+  if (!btn) return;
+  if (resolveActiveProvider()) btn.classList.add("ai-active");
+  else                          btn.classList.remove("ai-active");
+}
+
+// ---- AI Setup modal ----
+
+let _showAddEndpoint = false;
+
+function openAiModal() {
+  _showAddEndpoint = false;
+  _suggestedLocalServers = [];
+  $("#ai-key-section").hidden = true;
+  $("#ai-add-endpoint").hidden = true;
+  $("#ai-modal-overlay").classList.add("open");
+  renderProviderCards();
+  refreshAllLocalModels().then(renderProviderCards);
+  probeWellKnownLocalServers();  // background — re-renders on its own
+}
+
+function closeAiModal() {
+  $("#ai-modal-overlay").classList.remove("open");
+  $("#ai-key-input").value = "";
+  $("#ai-endpoint-input").value = "";
+  refreshHeaderIndicator();
+}
+
+function renderProviderCards() {
+  const wrap = $("#ai-provider-cards");
+  if (!wrap) return;
+  const current = getStoredProvider();
+  wrap.innerHTML = "";
+
+  const addCard = (opts) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = `ai-provider-card${opts.selected ? " selected" : ""}${opts.extra || ""}`;
+    b.innerHTML = `
+      <div class="ai-card-title">${escapeHtml(opts.title)}</div>
+      <div class="ai-card-desc">${escapeHtml(opts.desc)}</div>
+      ${opts.badge ? `<div class="ai-card-badge ${opts.badgeClass}">${escapeHtml(opts.badge)}</div>` : ""}
+    `;
+    b.onclick = opts.onClick;
+    wrap.appendChild(b);
+  };
+
+  // No AI
+  addCard({
+    title: "No AI",
+    desc: "Play and build without an AI thinking partner.",
+    badge: "Off", badgeClass: "ai-badge-none",
+    selected: current === "none",
+    onClick: () => { setStoredProvider("none"); _showAddEndpoint = false; $("#ai-key-section").hidden = true; $("#ai-add-endpoint").hidden = true; renderProviderCards(); },
+  });
+
+  // Cloud providers
+  for (const p of AI_CLOUD_PROVIDERS) {
+    addCard({
+      title: p.label,
+      desc: p.desc,
+      badge: p.badge, badgeClass: p.badgeClass,
+      selected: current === p.id,
+      onClick: () => {
+        setStoredProvider(p.id);
+        _showAddEndpoint = false;
+        $("#ai-add-endpoint").hidden = true;
+        showKeyEntry(p);
+        renderProviderCards();
+      },
+    });
+  }
+
+  // Local model tiles
+  for (const url of getStoredLocalEndpoints()) {
+    const models = localModelsByEndpoint[url] || [];
+    if (models.length === 0) {
+      addCard({
+        title: pretty(url),
+        desc: "No models found yet — is this server running?",
+        badge: "Local", badgeClass: "ai-badge-local",
+        selected: false,
+        onClick: () => discoverModelsAt(url).then(renderProviderCards),
+      });
+    } else {
+      for (const m of models) {
+        const provId = `local:${url}:${m.id}`;
+        addCard({
+          title: m.label,
+          desc: `Runs on ${pretty(url)}.`,
+          badge: "Local", badgeClass: "ai-badge-local",
+          selected: current === provId,
+          onClick: () => {
+            setStoredProvider(provId);
+            _showAddEndpoint = false;
+            $("#ai-key-section").hidden = true;
+            $("#ai-add-endpoint").hidden = true;
+            renderProviderCards();
+          },
+        });
+      }
+    }
+  }
+
+  // Detected local servers (well-known ports that responded to a probe).
+  // One-click: saves the endpoint AND selects its first model.
+  for (const sug of _suggestedLocalServers) {
+    const firstModel = sug.models[0];
+    const provId = `local:${sug.url}:${firstModel.id}`;
+    addCard({
+      title: `Detected: ${pretty(sug.url)}`,
+      desc: `${sug.hint} · ${firstModel.label}${sug.models.length > 1 ? ` (+${sug.models.length - 1} more)` : ""} · click to add`,
+      badge: "Local", badgeClass: "ai-badge-local",
+      extra: " add-server",
+      onClick: () => {
+        const list = getStoredLocalEndpoints();
+        if (!list.includes(sug.url)) {
+          list.push(sug.url);
+          setStoredLocalEndpoints(list);
+        }
+        localModelsByEndpoint[sug.url] = sug.models;
+        setStoredProvider(provId);
+        _suggestedLocalServers = _suggestedLocalServers.filter(s => s.url !== sug.url);
+        $("#ai-key-section").hidden = true;
+        $("#ai-add-endpoint").hidden = true;
+        renderProviderCards();
+      },
+    });
+  }
+
+  // + Add local server
+  addCard({
+    title: "+ Add local server",
+    desc: "Connect to an OpenAI-compatible LLM on your machine or network.",
+    extra: " add-server",
+    onClick: () => {
+      _showAddEndpoint = true;
+      $("#ai-key-section").hidden = true;
+      $("#ai-add-endpoint").hidden = false;
+      setTimeout(() => $("#ai-endpoint-input")?.focus(), 0);
+    },
+  });
+}
+
+function pretty(url) {
+  return String(url).replace(/^https?:\/\//, "").replace(/\/+$/, "");
+}
+
+function showKeyEntry(provider) {
+  const hasStored = !!getStoredKey(provider.id);
+  $("#ai-key-input").value = "";
+  $("#ai-key-input").placeholder = hasStored
+    ? `Key saved · type to replace · ${provider.placeholder}`
+    : provider.placeholder;
+  $("#ai-key-hint").innerHTML = provider.keyHint;
+  $("#ai-key-section").hidden = false;
+  $("#ai-add-endpoint").hidden = true;
+  setTimeout(() => $("#ai-key-input")?.focus(), 0);
+}
+
+function commitKeyEntry() {
+  const id = getStoredProvider();
+  const cloud = AI_CLOUD_PROVIDERS.find(p => p.id === id);
+  if (!cloud) return;
+  const v = $("#ai-key-input").value.trim();
+  if (v) setStoredKey(cloud.id, v);
+  $("#ai-key-input").value = "";
+}
+
+function commitNewEndpoint() {
+  const raw = $("#ai-endpoint-input").value.trim();
+  if (!/^https?:\/\//i.test(raw)) return;
+  const clean = raw.replace(/\/+$/, "");
+  const list = getStoredLocalEndpoints();
+  if (!list.includes(clean)) {
+    list.push(clean);
+    setStoredLocalEndpoints(list);
+  }
+  $("#ai-endpoint-input").value = "";
+  _showAddEndpoint = false;
+  $("#ai-add-endpoint").hidden = true;
+  discoverModelsAt(clean).then(renderProviderCards);
+}
+
+function bindAiUI() {
   const openBtn = $("#open-keys");
-  const closeBtn = $("#keys-close");
-  if (openBtn) openBtn.addEventListener("click", (e) => { e.preventDefault(); openKeysDialog(); });
-  if (closeBtn) closeBtn.addEventListener("click", () => $("#keys-dialog").close());
+  if (openBtn) openBtn.addEventListener("click", (e) => { e.preventDefault(); openAiModal(); });
+
+  const overlay = $("#ai-modal-overlay");
+  if (overlay) overlay.addEventListener("click", (e) => { if (e.target === overlay) { commitKeyEntry(); closeAiModal(); } });
+
+  $("#ai-modal-done")?.addEventListener("click", () => { commitKeyEntry(); closeAiModal(); });
+
+  $("#ai-key-input")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { commitKeyEntry(); closeAiModal(); }
+    else if (e.key === "Escape") { $("#ai-key-input").value = ""; closeAiModal(); }
+  });
+  $("#ai-key-input")?.addEventListener("blur", commitKeyEntry);
+
+  $("#ai-endpoint-input")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") commitNewEndpoint();
+    else if (e.key === "Escape") {
+      $("#ai-endpoint-input").value = "";
+      _showAddEndpoint = false;
+      $("#ai-add-endpoint").hidden = true;
+    }
+  });
+
+  // Generate modal
+  const genOverlay = $("#gen-modal-overlay");
+  if (genOverlay) genOverlay.addEventListener("click", (e) => { if (e.target === genOverlay) closeGenerateModal(); });
+  $("#gen-cancel")?.addEventListener("click", closeGenerateModal);
+  $("#gen-change")?.addEventListener("click", (e) => { e.preventDefault(); closeGenerateModal(); openAiModal(); });
+  $("#gen-go")?.addEventListener("click", runGenerate);
+
+  refreshHeaderIndicator();
 }
 
 // ---- Generate dialog ----
 
 function openGenerateDialog() {
-  const have = providersWithKeys();
-  if (!have.length) {
-    alert("No AI models available. Click 🤖 AI Models in the top nav to add one (or make sure the local Athena V6 shim is running).");
-    return;
+  const provider = resolveActiveProvider();
+  const usingEl = $("#gen-using");
+  if (provider) {
+    usingEl.innerHTML = `Using: <strong>${escapeHtml(provider.label)}</strong> · <a href="#" id="gen-change">change in AI Setup</a>`;
+  } else {
+    usingEl.innerHTML = `No model selected — <a href="#" id="gen-change">choose one in AI Setup</a>.`;
   }
-  const sel = $("#gen-provider");
-  fillSelect(sel, have.map(p => ({ value: p.id, label: p.label })));
+  // Re-bind the (possibly recreated) "change" link
+  $("#gen-change")?.addEventListener("click", (e) => { e.preventDefault(); closeGenerateModal(); openAiModal(); });
+
   $("#gen-topic").value = "";
   $("#gen-status").textContent = "";
-  $("#gen-dialog").showModal();
-  $("#gen-cancel").onclick = () => $("#gen-dialog").close();
-  $("#gen-go").onclick = runGenerate;
+  $("#gen-modal-overlay").classList.add("open");
+  setTimeout(() => $("#gen-topic")?.focus(), 0);
+}
+
+function closeGenerateModal() {
+  $("#gen-modal-overlay").classList.remove("open");
 }
 
 async function runGenerate() {
-  const providerId = $("#gen-provider").value;
-  const provider = PROVIDERS.find(p => p.id === providerId);
-  const key = getKey(providerId);
-  if (!provider || !key) {
-    $("#gen-status").textContent = "No key for that provider.";
+  const provider = resolveActiveProvider();
+  if (!provider) {
+    $("#gen-status").textContent = "Pick a model first via 🤖 AI Setup.";
     return;
   }
-  // Pull current build form metadata
   const fd = new FormData($("#build-form"));
   const language = String(fd.get("language") || "");
   const subject = String(fd.get("subject") || "");
   const grade = String(fd.get("grade") || "");
   const formTopic = String(fd.get("topic") || "");
   if (!language || !subject || !grade) {
-    $("#gen-status").textContent = "Please choose language, subject, and grade level on the form first.";
+    $("#gen-status").textContent = "Choose language, subject, and grade level on the form first.";
     return;
   }
   const topicHint = $("#gen-topic").value.trim();
   const prompt = buildPrompt({ language, subject, grade, topicHint, formTopic });
 
   $("#gen-go").disabled = true;
-  $("#gen-status").textContent = "Generating… this can take 5–20 seconds.";
+  $("#gen-status").textContent = `Generating with ${provider.label}… this can take 5–20 seconds.`;
   try {
-    const text = await provider.generate(key, prompt);
+    const text = await provider.generate({ prompt, jsonMode: true });
     const puzzle = parsePuzzleJSON(text);
-    // Prefer the user's explicit topic; otherwise use whatever the AI picked, falling back to nothing
     const topic = formTopic || (TOPICS.find(t => t.id === puzzle.topic) ? puzzle.topic : "");
     fillBuildFormFromPuzzle({ ...puzzle, language, subject, grade, topic });
     $("#gen-status").textContent = "✓ Generated — review and edit before submitting.";
-    setTimeout(() => $("#gen-dialog").close(), 600);
+    setTimeout(closeGenerateModal, 600);
   } catch (e) {
     console.error(e);
     $("#gen-status").textContent = "Error: " + (e.message || e);
@@ -958,22 +1232,26 @@ async function callOpenAICompatible({ url, key, model, prompt, systemMessage, js
   return data.choices?.[0]?.message?.content || "";
 }
 
-async function callGemini({ key, model, prompt }) {
+async function callGemini({ key, model, prompt, systemMessage, jsonMode = true }) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+  const body = {
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.8 },
+  };
+  if (jsonMode) body.generationConfig.responseMimeType = "application/json";
+  if (systemMessage) body.systemInstruction = { parts: [{ text: systemMessage }] };
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.8, responseMimeType: "application/json" },
-    }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`${res.status}: ${(await res.text()).slice(0, 200)}`);
   const data = await res.json();
   return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 }
 
-async function callAnthropic({ key, model, prompt }) {
+async function callAnthropic({ key, model, prompt, systemMessage }) {
+  const sys = systemMessage || "You are a careful, school-appropriate puzzle author. Return only JSON when asked.";
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -986,7 +1264,7 @@ async function callAnthropic({ key, model, prompt }) {
       model,
       max_tokens: 1024,
       temperature: 0.8,
-      system: "You are a careful, school-appropriate puzzle author. Return only JSON when asked.",
+      system: sys,
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -996,5 +1274,5 @@ async function callAnthropic({ key, model, prompt }) {
 }
 
 // boot
-bindKeysUI();
+bindAiUI();
 route();

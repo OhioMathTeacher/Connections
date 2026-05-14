@@ -28,48 +28,52 @@
     <a href="#/build">Build</a>
     <a href="#/tips">Tips</a>
     <a href="#/about">About</a>
-    <a href="#" id="open-keys" class="key-link">🤖 AI Models</a>
+    <a href="#" id="open-keys" class="ai-btn"><span class="ai-dot"></span>🤖 AI Setup</a>
   </nav>
 </header>
 
 <main id="app"></main>
 
-<dialog id="keys-dialog">
-  <form method="dialog" class="dialog-body">
-    <h3>AI Models</h3>
-    <p class="muted">Choose a model to use for puzzle generation. <strong>Local models</strong> (like Athena V6) run on your machine and need no key. <strong>Cloud models</strong> require an API key — stored only in your browser, never uploaded.</p>
-    <div id="keys-grid" class="keys-grid"></div>
-    <div id="key-editor" class="key-editor" hidden>
-      <h4 id="key-editor-title"></h4>
-      <p class="muted"><a id="key-editor-link" href="#" target="_blank" rel="noopener">Get a key →</a></p>
-      <input type="password" id="key-editor-input" placeholder="Paste your API key">
-      <div class="buttons">
-        <button type="button" id="key-editor-cancel">Cancel</button>
-        <button type="button" id="key-editor-remove">Remove</button>
-        <button type="button" id="key-editor-save" class="primary">Save</button>
+<div class="ai-modal-overlay" id="ai-modal-overlay">
+  <div class="ai-modal" role="dialog" aria-labelledby="ai-modal-title" aria-modal="true">
+    <h2 id="ai-modal-title">AI Setup</h2>
+    <div id="ai-provider-cards" class="ai-provider-cards"></div>
+
+    <div id="ai-key-section" class="ai-key-section" hidden>
+      <input type="password" id="ai-key-input" placeholder="Paste your API key" autocomplete="off">
+      <div class="ai-key-hint" id="ai-key-hint"></div>
+    </div>
+
+    <div id="ai-add-endpoint" class="ai-key-section" hidden>
+      <input type="url" id="ai-endpoint-input" placeholder="http://… or https://…  (URL only, NOT an API key)" autocomplete="off">
+      <div class="ai-key-hint">
+        Connect an OpenAI-compatible server you're running locally. Discovered models appear as tiles above. Press <kbd>Enter</kbd> to add, <kbd>Esc</kbd> to cancel.
       </div>
     </div>
-    <div class="buttons" style="justify-content: flex-end; margin-top: 1rem;">
-      <button type="button" id="keys-close">Close</button>
-    </div>
-  </form>
-</dialog>
 
-<dialog id="gen-dialog">
-  <form method="dialog" class="dialog-body">
-    <h3>✨ Generate a puzzle with AI</h3>
-    <p class="muted">Uses the language, subject, and grade level you've selected on the Build form. Add a topic hint for better results.</p>
-    <label>Provider <select id="gen-provider"></select></label>
-    <label>Topic hint (optional)
-      <input type="text" id="gen-topic" placeholder="e.g., the water cycle, WWII, fractions, poetry devices…">
-    </label>
-    <div id="gen-status" class="muted" aria-live="polite"></div>
-    <div class="buttons" style="justify-content: flex-end;">
-      <button type="button" id="gen-cancel">Cancel</button>
-      <button type="button" id="gen-go" class="primary">Generate</button>
+    <div class="ai-modal-actions">
+      <button type="button" class="am-save" id="ai-modal-done">Done</button>
     </div>
-  </form>
-</dialog>
+  </div>
+</div>
+
+<div class="ai-modal-overlay" id="gen-modal-overlay">
+  <div class="ai-modal" role="dialog" aria-labelledby="gen-modal-title" aria-modal="true">
+    <h2 id="gen-modal-title">✨ Generate a puzzle</h2>
+    <p class="ai-modal-sub">Uses the language, subject, and grade level you've selected on the Build form. Add a topic hint for better results.</p>
+    <div class="ai-key-section" style="margin-top: 0.4rem;">
+      <div class="ai-key-hint" id="gen-using">Using: <strong>—</strong> · <a href="#" id="gen-change">change in AI Setup</a></div>
+    </div>
+    <div class="ai-key-section">
+      <input type="text" id="gen-topic" placeholder="Topic hint (optional): water cycle, WWII, fractions…">
+    </div>
+    <div id="gen-status" class="ai-key-hint" aria-live="polite" style="min-height: 1.1em;"></div>
+    <div class="ai-modal-actions">
+      <button type="button" class="am-cancel" id="gen-cancel">Cancel</button>
+      <button type="button" class="am-save" id="gen-go">Generate</button>
+    </div>
+  </div>
+</div>
 
 <template id="view-home">
   <section class="home">
