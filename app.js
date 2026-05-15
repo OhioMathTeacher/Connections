@@ -770,13 +770,37 @@ function setStoredLocalEndpoints(arr) {
   localStorage.setItem(AI_STORAGE.endpoints, JSON.stringify(arr));
 }
 
-// "local:<endpoint>:<modelId>" — endpoint may contain colons, so modelId is after the LAST colon.
+// "local:<endpoint>:<modelId>" — endpoint is a URL (with optional :port), modelId may itself
+// contain colons (e.g. Ollama's "gemma3:27b"). Split on the FIRST colon after the host[:port].
 function parseLocalProvider(id) {
   if (!id || !id.startsWith("local:")) return null;
   const rest = id.slice("local:".length);
-  const lastColon = rest.lastIndexOf(":");
-  if (lastColon === -1) return null;
-  return { endpoint: rest.slice(0, lastColon), modelId: rest.slice(lastColon + 1) };
+  const m = rest.match(/^(https?:\/\/[^:/]+(?::\d+)?)(?::(.+))?$/);
+  if (!m || !m[2]) return null;
+  return { endpoint: m[1], modelId: m[2] };
+}
+
+// Embedding models can't do chat completions; filter them out of selectable tiles.
+function isEmbeddingModel(id) {
+  return /(^|[\/:_-])embed(ding)?($|[\/:_-])|nomic-embed|mxbai-embed|bge-/i.test(String(id));
+}
+
+// "gemma3:27b" -> "Gemma 3 · 27B"; "qwen2.5-coder:7b" -> "Qwen 2.5 Coder · 7B"; otherwise original.
+function prettyModelLabel(id) {
+  const s = String(id);
+  const m = s.match(/^([a-z][a-z0-9.\-]*?)[:\-]([0-9]+(?:\.[0-9]+)?[bm])$/i);
+  if (!m) return s;
+  const family = m[1]
+    .replace(/(\d)/, " $1")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, c => c.toUpperCase());
+  return `${family} · ${m[2].toUpperCase()}`;
+}
+
+function shortModelLabel(id) {
+  return prettyModelLabel(id);
 }
 
 // In-memory cache of models discovered per endpoint: { [url]: [{id,label}, ...] }
@@ -801,10 +825,12 @@ async function discoverModelsAt(url) {
     const res = await fetch(probe, { method: "GET" });
     if (!res.ok) throw new Error(`${res.status}`);
     const data = await res.json();
-    const models = (data.data || []).map(m => ({
-      id: String(m.id),
-      label: String(m.id),
-    }));
+    const models = (data.data || [])
+      .filter(m => m?.id && !isEmbeddingModel(m.id))
+      .map(m => ({
+        id: String(m.id),
+        label: prettyModelLabel(m.id),
+      }));
     localModelsByEndpoint[url] = models;
     return models;
   } catch (e) {
@@ -828,7 +854,9 @@ async function probeWellKnownLocalServers() {
       const res = await fetch(`${c.url}/v1/models`, { method: "GET", signal: AbortSignal.timeout(1500) });
       if (!res.ok) return null;
       const data = await res.json();
-      const models = (data.data || []).map(m => ({ id: String(m.id), label: String(m.id) }));
+      const models = (data.data || [])
+        .filter(m => m?.id && !isEmbeddingModel(m.id))
+        .map(m => ({ id: String(m.id), label: prettyModelLabel(m.id) }));
       if (!models.length) return null;
       return { url: c.url, hint: c.hint, models };
     } catch { return null; }
@@ -845,7 +873,7 @@ function resolveActiveProvider() {
   if (local) {
     const trimmed = local.endpoint.replace(/\/+$/, "");
     return {
-      label: local.modelId,
+      label: prettyModelLabel(local.modelId),
       generate: ({ prompt, systemMessage, jsonMode }) => callOpenAICompatible({
         url: `${trimmed}/v1/chat/completions`,
         key: "local",
